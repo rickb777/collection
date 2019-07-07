@@ -1,0 +1,52 @@
+#!/bin/bash -e
+cd $(dirname $BASH_SOURCE)
+BASE=$PWD
+
+FIRST=$(go env GOPATH | cut -d: -f1)
+PATH=$FIRST/bin:$PATH
+
+function getVersionedTool
+{
+  if [ ! -x $FIRST/bin/$2-$3 ]; then
+    echo go get $1@$3
+    go get $1@$3
+    cd $FIRST/bin
+    cp -v $2 $2-$3
+    cd -
+  fi
+}
+
+getVersionedTool github.com/rickb777/runtemplate/v3 runtemplate v3.4.2
+
+core="Stringer:true Comparable:true"
+int="Ordered:true Numeric:true"
+enc="GobEncode:true JsonEncode:true"
+
+function generateGroup
+{
+    cd $1
+
+    runtemplate -f -v -tpl $2/collection.tpl $3 Type=string ToSet:true  $core           MapTo:int
+    runtemplate -f -v -tpl $2/collection.tpl $3 Type=int    ToSet:true  $core $enc $int MapTo:string
+
+    runtemplate -f -v -tpl $2/list.tpl       $3 Type=string ToSet:true  $core $enc      MapTo:int
+    runtemplate -f -v -tpl $2/list.tpl       $3 Type=int    ToSet:true  $core $enc $int MapTo:string
+
+    runtemplate -f -v -tpl $2/set.tpl        $3 Type=string ToList:true $core $enc      MapTo:int
+    runtemplate -f -v -tpl $2/set.tpl        $3 Type=int    ToList:true $core $enc $int MapTo:string
+
+    runtemplate -f -v -tpl $2/map.tpl        $3 Key=string  Type=string $core $enc
+    runtemplate -f -v -tpl $2/map.tpl        $3 Key=int     Type=int    $core $enc $int
+
+    cd $BASE
+}
+
+generateGroup . simple
+generateGroup immutable immutable  Prefix=I
+generateGroup .         threadsafe Prefix=Shared
+
+#runtemplate -tpl types/stringy.tpl         Prefix=X1 Type=Email SortableSlice:true
+#runtemplate -tpl plumbing/plumbing.tpl     Prefix=X1 Type=Apple
+#runtemplate -tpl plumbing/mapTo.tpl        Prefix=X1 Type=Apple ToPrefix=X1 ToType=Pear
+
+go test ./...
