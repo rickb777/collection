@@ -2,7 +2,6 @@
 
 [![GoDoc](https://img.shields.io/badge/api-Godoc-blue.svg?style=flat-square)](https://godoc.org/github.com/rickb777/collection)
 [![Build Status](https://travis-ci.org/rickb777/collection.svg?branch=master)](https://travis-ci.org/rickb777/collection)
-[![Code Coverage](https://img.shields.io/coveralls/rickb777/collection.svg)](https://coveralls.io/r/rickb777/collection)
 [![Issues](https://img.shields.io/github/issues/rickb777/collection.svg)](https://github.com/rickb777/collection/issues)
 
 A suite of general-purpose collections for Go.
