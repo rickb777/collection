@@ -28,15 +28,22 @@ function generateGroup
 
     runtemplate -f -v -tpl $2/collection.tpl $3 Type=string ToSet:true  $core           MapTo:int
     runtemplate -f -v -tpl $2/collection.tpl $3 Type=int    ToSet:true  $core $enc $int MapTo:string
+    runtemplate -f -v -tpl $2/collection.tpl $3 Type=int64  ToSet:true  $core $enc $int MapTo:string
 
     runtemplate -f -v -tpl $2/list.tpl       $3 Type=string ToSet:true  $core $enc      MapTo:int
     runtemplate -f -v -tpl $2/list.tpl       $3 Type=int    ToSet:true  $core $enc $int MapTo:string
+    runtemplate -f -v -tpl $2/list.tpl       $3 Type=int64  ToSet:true  $core $enc $int MapTo:string
 
     runtemplate -f -v -tpl $2/set.tpl        $3 Type=string ToList:true $core $enc      MapTo:int
     runtemplate -f -v -tpl $2/set.tpl        $3 Type=int    ToList:true $core $enc $int MapTo:string
+    runtemplate -f -v -tpl $2/set.tpl        $3 Type=int64  ToList:true $core $enc $int MapTo:string
 
     runtemplate -f -v -tpl $2/map.tpl        $3 Key=string  Type=string $core $enc
+    runtemplate -f -v -tpl $2/map.tpl        $3 Key=string  Type=int    $core $enc
+    runtemplate -f -v -tpl $2/map.tpl        $3 Key=int     Type=string $core $enc
+
     runtemplate -f -v -tpl $2/map.tpl        $3 Key=int     Type=int    $core $enc $int
+    runtemplate -f -v -tpl $2/map.tpl        $3 Key=int64   Type=int64  $core $enc $int
 
     cd $BASE
 }
