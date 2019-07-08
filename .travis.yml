@@ -1,0 +1,13 @@
+language: go
+
+go:
+  - "1.12"
+
+# install is needed because it overrides the default behaviour (which doesn't work)
+install:
+  - unset GOPATH
+
+script:
+  - ./build
+
+
