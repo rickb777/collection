@@ -27,38 +27,46 @@ function generateGroup
 {
     cd $1
 
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 Type=string ToSet:true  $core           MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 Type=int    ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 Type=uint   ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 Type=int64  ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 Type=uint64 ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=string ToSet:true  $core           MapTo:int
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=int    ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=uint   ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=int64  ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=uint64 ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 'Type=interface{}/Any/nil' ToSet:true
 
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 Type=string ToSet:true  $core $enc      MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 Type=int    ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 Type=uint   ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 Type=int64  ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 Type=uint64 ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=string ToSet:true  $core $enc      MapTo:int
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=int    ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=uint   ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=int64  ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=uint64 ToSet:true  $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 'Type=interface{}/Any/nil' ToSet:true
 
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 Type=string ToList:true $core $enc      MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 Type=int    ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 Type=uint   ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 Type=int64  ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 Type=uint64 ToList:true $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=string ToList:true $core $enc      MapTo:int
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=int    ToList:true $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=uint   ToList:true $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=int64  ToList:true $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=uint64 ToList:true $core $enc $int MapTo:string
+    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 'Type=interface{}/Any/nil' ToList:true
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=string  Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=string  Type=int    $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=string  Type=uint   $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=string $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=int    $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=uint   $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string 'Type=interface{}/Any/nil'
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=int     Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=uint    Type=string $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int     Type=string $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint    Type=string $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int64   Type=string $core $enc
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint64  Type=string $core $enc
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=int     Type=int    $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=uint    Type=uint   $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=int64   Type=int64  $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3 Key=uint64  Type=uint64 $core $enc $int
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int     Type=int    $core $enc $int
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint    Type=uint   $core $enc $int
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int64   Type=int64  $core $enc $int
+    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint64  Type=uint64 $core $enc $int
 
     cd $BASE
 }
+
+rm -f *_*.go immutable/*_*.go
 
 generateGroup .         simple
 generateGroup immutable immutable
