@@ -1,6 +1,6 @@
 // Generated from simple/collection.tpl with Type=int64
 // options: Comparable:true Numeric:true Ordered:true Stringer:true Mutable:always
-// by runtemplate v3.4.2
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection

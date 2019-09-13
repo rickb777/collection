@@ -4,7 +4,7 @@
 // Generated from threadsafe/list.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:int
-// by runtemplate v3.4.2
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection

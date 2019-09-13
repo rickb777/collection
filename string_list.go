@@ -4,7 +4,7 @@
 // Generated from simple/list.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true
-// by runtemplate v3.4.2
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -478,6 +478,25 @@ func (list StringList) Map(f func(string) string) StringList {
 	return result
 }
 
+// MapToInt returns a new []int by transforming every element with function f.
+// The resulting slice is the same size as the list.
+// The list is not modified.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (list StringList) MapToInt(f func(string) int) []int {
+	if list == nil {
+		return nil
+	}
+
+	result := make([]int, len(list))
+	for i, v := range list {
+		result[i] = f(v)
+	}
+
+	return result
+}
+
 // FlatMap returns a new StringList by transforming every element with function f that
 // returns zero or more items in a slice. The resulting list may have a different size to the original list.
 // The original list is not modified.
@@ -487,6 +506,25 @@ func (list StringList) Map(f func(string) string) StringList {
 func (list StringList) FlatMap(f func(string) []string) StringList {
 	result := MakeStringList(0, len(list))
 
+	for _, v := range list {
+		result = append(result, f(v)...)
+	}
+
+	return result
+}
+
+// FlatMapToInt returns a new []int by transforming every element with function f that
+// returns zero or more items in a slice. The resulting slice may have a different size to the list.
+// The list is not modified.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (list StringList) FlatMapToInt(f func(string) []int) []int {
+	if list == nil {
+		return nil
+	}
+
+	result := make([]int, 0, len(list))
 	for _, v := range list {
 		result = append(result, f(v)...)
 	}
@@ -644,7 +682,6 @@ func (sl sortableStringList) Swap(i, j int) {
 // SortBy alters the list so that the elements are sorted by a specified ordering.
 // Sorting happens in-place; the modified list is returned.
 func (list StringList) SortBy(less func(i, j string) bool) StringList {
-
 	sort.Sort(sortableStringList{less, list})
 	return list
 }
@@ -653,7 +690,6 @@ func (list StringList) SortBy(less func(i, j string) bool) StringList {
 // Sorting happens in-place; the modified list is returned.
 // The algorithm keeps the original order of equal elements.
 func (list StringList) StableSortBy(less func(i, j string) bool) StringList {
-
 	sort.Stable(sortableStringList{less, list})
 	return list
 }

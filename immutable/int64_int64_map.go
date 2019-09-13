@@ -1,10 +1,10 @@
-// An encapsulated immutable map[string]string.
+// An encapsulated immutable map[int64]int64.
 // Thread-safe.
 //
 //
-// Generated from immutable/map.tpl with Key=string Type=string
+// Generated from immutable/map.tpl with Key=int64 Type=int64
 // options: Comparable:true Stringer:true KeyList:<no value> ValueList:<no value> Mutable:disabled
-// by runtemplate v3.4.2
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -12,52 +12,51 @@ package immutable
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 )
 
-// IStringStringMap is the primary type that represents a thread-safe map
-type IStringStringMap struct {
-	m map[string]string
+// Int64Int64Map is the primary type that represents a thread-safe map
+type Int64Int64Map struct {
+	m map[int64]int64
 }
 
-// IStringStringTuple represents a key/value pair.
-type IStringStringTuple struct {
-	Key string
-	Val string
+// Int64Int64Tuple represents a key/value pair.
+type Int64Int64Tuple struct {
+	Key int64
+	Val int64
 }
 
-// IStringStringTuples can be used as a builder for unmodifiable maps.
-type IStringStringTuples []IStringStringTuple
+// Int64Int64Tuples can be used as a builder for unmodifiable maps.
+type Int64Int64Tuples []Int64Int64Tuple
 
 // Append1 adds one item.
-func (ts IStringStringTuples) Append1(k string, v string) IStringStringTuples {
-	return append(ts, IStringStringTuple{k, v})
+func (ts Int64Int64Tuples) Append1(k int64, v int64) Int64Int64Tuples {
+	return append(ts, Int64Int64Tuple{k, v})
 }
 
 // Append2 adds two items.
-func (ts IStringStringTuples) Append2(k1 string, v1 string, k2 string, v2 string) IStringStringTuples {
-	return append(ts, IStringStringTuple{k1, v1}, IStringStringTuple{k2, v2})
+func (ts Int64Int64Tuples) Append2(k1 int64, v1 int64, k2 int64, v2 int64) Int64Int64Tuples {
+	return append(ts, Int64Int64Tuple{k1, v1}, Int64Int64Tuple{k2, v2})
 }
 
 // Append3 adds three items.
-func (ts IStringStringTuples) Append3(k1 string, v1 string, k2 string, v2 string, k3 string, v3 string) IStringStringTuples {
-	return append(ts, IStringStringTuple{k1, v1}, IStringStringTuple{k2, v2}, IStringStringTuple{k3, v3})
+func (ts Int64Int64Tuples) Append3(k1 int64, v1 int64, k2 int64, v2 int64, k3 int64, v3 int64) Int64Int64Tuples {
+	return append(ts, Int64Int64Tuple{k1, v1}, Int64Int64Tuple{k2, v2}, Int64Int64Tuple{k3, v3})
 }
 
-// IStringStringZip is used with the Values method to zip (i.e. interleave) a slice of
-// keys with a slice of values. These can then be passed in to the NewIStringStringMap
+// Int64Int64Zip is used with the Values method to zip (i.e. interleave) a slice of
+// keys with a slice of values. These can then be passed in to the NewInt64Int64Map
 // constructor function.
-func IStringStringZip(keys ...string) IStringStringTuples {
-	ts := make(IStringStringTuples, len(keys))
+func Int64Int64Zip(keys ...int64) Int64Int64Tuples {
+	ts := make(Int64Int64Tuples, len(keys))
 	for i, k := range keys {
 		ts[i].Key = k
 	}
 	return ts
 }
 
-// Values sets the values in a tuple slice. Use this with IStringStringZip.
-func (ts IStringStringTuples) Values(values ...string) IStringStringTuples {
+// Values sets the values in a tuple slice. Use this with Int64Int64Zip.
+func (ts Int64Int64Tuples) Values(values ...int64) Int64Int64Tuples {
 	if len(ts) != len(values) {
 		panic(fmt.Errorf("Mismatched %d keys and %d values", len(ts), len(values)))
 	}
@@ -69,22 +68,22 @@ func (ts IStringStringTuples) Values(values ...string) IStringStringTuples {
 
 //-------------------------------------------------------------------------------------------------
 
-func newIStringStringMap() *IStringStringMap {
-	return &IStringStringMap{
-		m: make(map[string]string),
+func newInt64Int64Map() *Int64Int64Map {
+	return &Int64Int64Map{
+		m: make(map[int64]int64),
 	}
 }
 
-// NewIStringStringMap1 creates and returns a reference to a map containing one item.
-func NewIStringStringMap1(k string, v string) *IStringStringMap {
-	mm := newIStringStringMap()
+// NewInt64Int64Map1 creates and returns a reference to a map containing one item.
+func NewInt64Int64Map1(k int64, v int64) *Int64Int64Map {
+	mm := newInt64Int64Map()
 	mm.m[k] = v
 	return mm
 }
 
-// NewIStringStringMap creates and returns a reference to a map, optionally containing some items.
-func NewIStringStringMap(kv ...IStringStringTuple) *IStringStringMap {
-	mm := newIStringStringMap()
+// NewInt64Int64Map creates and returns a reference to a map, optionally containing some items.
+func NewInt64Int64Map(kv ...Int64Int64Tuple) *Int64Int64Map {
+	mm := newInt64Int64Map()
 	for _, t := range kv {
 		mm.m[t.Key] = t.Val
 	}
@@ -92,12 +91,12 @@ func NewIStringStringMap(kv ...IStringStringTuple) *IStringStringMap {
 }
 
 // Keys returns the keys of the current map as a slice.
-func (mm *IStringStringMap) Keys() []string {
+func (mm *Int64Int64Map) Keys() []int64 {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]string, 0, len(mm.m))
+	s := make([]int64, 0, len(mm.m))
 	for k := range mm.m {
 		s = append(s, k)
 	}
@@ -106,12 +105,12 @@ func (mm *IStringStringMap) Keys() []string {
 }
 
 // Values returns the values of the current map as a slice.
-func (mm *IStringStringMap) Values() []string {
+func (mm *Int64Int64Map) Values() []int64 {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]string, 0, len(mm.m))
+	s := make([]int64, 0, len(mm.m))
 	for _, v := range mm.m {
 		s = append(s, v)
 	}
@@ -120,37 +119,37 @@ func (mm *IStringStringMap) Values() []string {
 }
 
 // slice returns the internal elements of the map. This is a seam for testing etc.
-func (mm *IStringStringMap) slice() []IStringStringTuple {
+func (mm *Int64Int64Map) slice() []Int64Int64Tuple {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]IStringStringTuple, 0, len(mm.m))
+	s := make([]Int64Int64Tuple, 0, len(mm.m))
 	for k, v := range mm.m {
-		s = append(s, IStringStringTuple{k, v})
+		s = append(s, Int64Int64Tuple{k, v})
 	}
 
 	return s
 }
 
 // ToSlice returns the key/value pairs as a slice
-func (mm *IStringStringMap) ToSlice() []IStringStringTuple {
+func (mm *Int64Int64Map) ToSlice() []Int64Int64Tuple {
 	return mm.slice()
 }
 
 // Get returns one of the items in the map, if present.
-func (mm *IStringStringMap) Get(k string) (string, bool) {
+func (mm *Int64Int64Map) Get(k int64) (int64, bool) {
 	v, found := mm.m[k]
 	return v, found
 }
 
 // Put adds an item to a clone of the map, replacing any prior value and returning the cloned map.
-func (mm *IStringStringMap) Put(k string, v string) *IStringStringMap {
+func (mm *Int64Int64Map) Put(k int64, v int64) *Int64Int64Map {
 	if mm == nil {
-		return NewIStringStringMap1(k, v)
+		return NewInt64Int64Map1(k, v)
 	}
 
-	result := NewIStringStringMap()
+	result := NewInt64Int64Map()
 
 	for k, v := range mm.m {
 		result.m[k] = v
@@ -161,7 +160,7 @@ func (mm *IStringStringMap) Put(k string, v string) *IStringStringMap {
 }
 
 // ContainsKey determines if a given item is already in the map.
-func (mm *IStringStringMap) ContainsKey(k string) bool {
+func (mm *Int64Int64Map) ContainsKey(k int64) bool {
 	if mm == nil {
 		return false
 	}
@@ -171,7 +170,7 @@ func (mm *IStringStringMap) ContainsKey(k string) bool {
 }
 
 // ContainsAllKeys determines if the given items are all in the map.
-func (mm *IStringStringMap) ContainsAllKeys(kk ...string) bool {
+func (mm *Int64Int64Map) ContainsAllKeys(kk ...int64) bool {
 	if mm == nil {
 		return len(kk) == 0
 	}
@@ -185,7 +184,7 @@ func (mm *IStringStringMap) ContainsAllKeys(kk ...string) bool {
 }
 
 // Size returns how many items are currently in the map. This is a synonym for Len.
-func (mm *IStringStringMap) Size() int {
+func (mm *Int64Int64Map) Size() int {
 	if mm == nil {
 		return 0
 	}
@@ -194,18 +193,18 @@ func (mm *IStringStringMap) Size() int {
 }
 
 // IsEmpty returns true if the map is empty.
-func (mm *IStringStringMap) IsEmpty() bool {
+func (mm *Int64Int64Map) IsEmpty() bool {
 	return mm.Size() == 0
 }
 
 // NonEmpty returns true if the map is not empty.
-func (mm *IStringStringMap) NonEmpty() bool {
+func (mm *Int64Int64Map) NonEmpty() bool {
 	return mm.Size() > 0
 }
 
 // Foreach applies the function f to every element in the map.
 // The function can safely alter the values via side-effects.
-func (mm *IStringStringMap) Foreach(f func(string, string)) {
+func (mm *Int64Int64Map) Foreach(f func(int64, int64)) {
 	if mm != nil {
 		for k, v := range mm.m {
 			f(k, v)
@@ -219,7 +218,7 @@ func (mm *IStringStringMap) Foreach(f func(string, string)) {
 //
 // Note that this method can also be used simply as a way to visit every element using a function
 // with some side-effects; such a function must always return true.
-func (mm *IStringStringMap) Forall(f func(string, string) bool) bool {
+func (mm *Int64Int64Map) Forall(f func(int64, int64) bool) bool {
 	if mm == nil {
 		return true
 	}
@@ -236,7 +235,7 @@ func (mm *IStringStringMap) Forall(f func(string, string) bool) bool {
 // Exists applies the predicate p to every element in the map. If the function returns true,
 // the iteration terminates early. The returned value is true if an early return occurred.
 // or false if all elements were visited without finding a match.
-func (mm *IStringStringMap) Exists(p func(string, string) bool) bool {
+func (mm *Int64Int64Map) Exists(p func(int64, int64) bool) bool {
 	if mm == nil {
 		return false
 	}
@@ -250,30 +249,30 @@ func (mm *IStringStringMap) Exists(p func(string, string) bool) bool {
 	return false
 }
 
-// Find returns the first string that returns true for the predicate p.
+// Find returns the first int64 that returns true for the predicate p.
 // False is returned if none match.
-func (mm *IStringStringMap) Find(p func(string, string) bool) (IStringStringTuple, bool) {
+func (mm *Int64Int64Map) Find(p func(int64, int64) bool) (Int64Int64Tuple, bool) {
 	if mm == nil {
-		return IStringStringTuple{}, false
+		return Int64Int64Tuple{}, false
 	}
 
 	for k, v := range mm.m {
 		if p(k, v) {
-			return IStringStringTuple{k, v}, true
+			return Int64Int64Tuple{k, v}, true
 		}
 	}
 
-	return IStringStringTuple{}, false
+	return Int64Int64Tuple{}, false
 }
 
 // Filter applies the predicate p to every element in the map and returns a copied map containing
 // only the elements for which the predicate returned true.
-func (mm *IStringStringMap) Filter(p func(string, string) bool) *IStringStringMap {
+func (mm *Int64Int64Map) Filter(p func(int64, int64) bool) *Int64Int64Map {
 	if mm == nil {
 		return nil
 	}
 
-	result := NewIStringStringMap()
+	result := NewInt64Int64Map()
 
 	for k, v := range mm.m {
 		if p(k, v) {
@@ -287,13 +286,13 @@ func (mm *IStringStringMap) Filter(p func(string, string) bool) *IStringStringMa
 // Partition applies the predicate p to every element in the map. It divides the map into two copied maps,
 // the first containing all the elements for which the predicate returned true, and the second containing all
 // the others.
-func (mm *IStringStringMap) Partition(p func(string, string) bool) (matching *IStringStringMap, others *IStringStringMap) {
+func (mm *Int64Int64Map) Partition(p func(int64, int64) bool) (matching *Int64Int64Map, others *Int64Int64Map) {
 	if mm == nil {
 		return nil, nil
 	}
 
-	matching = NewIStringStringMap()
-	others = NewIStringStringMap()
+	matching = NewInt64Int64Map()
+	others = NewInt64Int64Map()
 
 	for k, v := range mm.m {
 		if p(k, v) {
@@ -305,16 +304,16 @@ func (mm *IStringStringMap) Partition(p func(string, string) bool) (matching *IS
 	return
 }
 
-// Map returns a new IStringMap by transforming every element with the function f.
+// Map returns a new Int64Map by transforming every element with the function f.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (mm *IStringStringMap) Map(f func(string, string) (string, string)) *IStringStringMap {
+func (mm *Int64Int64Map) Map(f func(int64, int64) (int64, int64)) *Int64Int64Map {
 	if mm == nil {
 		return nil
 	}
 
-	result := NewIStringStringMap()
+	result := NewInt64Int64Map()
 
 	for k1, v1 := range mm.m {
 		k2, v2 := f(k1, v1)
@@ -324,17 +323,17 @@ func (mm *IStringStringMap) Map(f func(string, string) (string, string)) *IStrin
 	return result
 }
 
-// FlatMap returns a new IStringMap by transforming every element with the function f that
+// FlatMap returns a new Int64Map by transforming every element with the function f that
 // returns zero or more items in a slice. The resulting map may have a different size to the original map.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (mm *IStringStringMap) FlatMap(f func(string, string) []IStringStringTuple) *IStringStringMap {
+func (mm *Int64Int64Map) FlatMap(f func(int64, int64) []Int64Int64Tuple) *Int64Int64Map {
 	if mm == nil {
 		return nil
 	}
 
-	result := NewIStringStringMap()
+	result := NewInt64Int64Map()
 
 	for k1, v1 := range mm.m {
 		ts := f(k1, v1)
@@ -349,7 +348,7 @@ func (mm *IStringStringMap) FlatMap(f func(string, string) []IStringStringTuple)
 // Equals determines if two maps are equal to each other.
 // If they both are the same size and have the same items they are considered equal.
 // Order of items is not relevent for maps to be equal.
-func (mm *IStringStringMap) Equals(other *IStringStringMap) bool {
+func (mm *Int64Int64Map) Equals(other *Int64Int64Map) bool {
 	if mm == nil || other == nil {
 		return mm.IsEmpty() && other.IsEmpty()
 	}
@@ -367,35 +366,35 @@ func (mm *IStringStringMap) Equals(other *IStringStringMap) bool {
 }
 
 // Clone returns the same map, which is immutable.
-func (mm *IStringStringMap) Clone() *IStringStringMap {
+func (mm *Int64Int64Map) Clone() *Int64Int64Map {
 	return mm
 }
 
 //-------------------------------------------------------------------------------------------------
 
-func (mm *IStringStringMap) String() string {
+func (mm *Int64Int64Map) String() string {
 	return mm.MkString3("[", ", ", "]")
 }
 
 // implements encoding.Marshaler interface {
-//func (mm *IStringStringMap) MarshalJSON() ([]byte, error) {
+//func (mm *Int64Int64Map) MarshalJSON() ([]byte, error) {
 //	return mm.mkString3Bytes("{\"", "\", \"", "\"}").Bytes(), nil
 //}
 
 // MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
-func (mm *IStringStringMap) MkString(sep string) string {
+func (mm *Int64Int64Map) MkString(sep string) string {
 	return mm.MkString3("", sep, "")
 }
 
 // MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
-func (mm *IStringStringMap) MkString3(before, between, after string) string {
+func (mm *Int64Int64Map) MkString3(before, between, after string) string {
 	if mm == nil {
 		return ""
 	}
 	return mm.mkString3Bytes(before, between, after).String()
 }
 
-func (mm *IStringStringMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
+func (mm *Int64Int64Map) mkString3Bytes(before, between, after string) *bytes.Buffer {
 	b := &bytes.Buffer{}
 	b.WriteString(before)
 	sep := ""
@@ -412,29 +411,16 @@ func (mm *IStringStringMap) mkString3Bytes(before, between, after string) *bytes
 
 //-------------------------------------------------------------------------------------------------
 
-// UnmarshalJSON implements JSON decoding for this map type.
-func (mm *IStringStringMap) UnmarshalJSON(b []byte) error {
-	buf := bytes.NewBuffer(b)
-	return json.NewDecoder(buf).Decode(&mm.m)
-}
-
-// MarshalJSON implements JSON encoding for this map type.
-func (mm *IStringStringMap) MarshalJSON() ([]byte, error) {
-	return json.Marshal(mm.m)
-}
-
-//-------------------------------------------------------------------------------------------------
-
 // GobDecode implements 'gob' decoding for this map type.
-// You must register string with the 'gob' package before this method is used.
-func (mm *IStringStringMap) GobDecode(b []byte) error {
+// You must register int64 with the 'gob' package before this method is used.
+func (mm *Int64Int64Map) GobDecode(b []byte) error {
 	buf := bytes.NewBuffer(b)
 	return gob.NewDecoder(buf).Decode(&mm.m)
 }
 
 // GobEncode implements 'gob' encoding for this list type.
-// You must register string with the 'gob' package before this method is used.
-func (mm *IStringStringMap) GobEncode() ([]byte, error) {
+// You must register int64 with the 'gob' package before this method is used.
+func (mm *Int64Int64Map) GobEncode() ([]byte, error) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(mm.m)
 	return buf.Bytes(), err

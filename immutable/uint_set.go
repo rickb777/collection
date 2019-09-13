@@ -1,10 +1,10 @@
-// An encapsulated immutable map[string]struct{} used as a set.
+// An encapsulated immutable map[uint]struct{} used as a set.
 // Thread-safe.
 //
 //
-// Generated from immutable/set.tpl with Type=string
-// options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true Mutable:disabled
-// by runtemplate v3.4.2
+// Generated from immutable/set.tpl with Type=uint
+// options: Comparable:always Numeric:true Ordered:true Stringer:true Mutable:disabled
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -16,15 +16,15 @@ import (
 	"fmt"
 )
 
-// IStringSet is the primary type that represents a set.
-type IStringSet struct {
-	m map[string]struct{}
+// UintSet is the primary type that represents a set.
+type UintSet struct {
+	m map[uint]struct{}
 }
 
-// NewIStringSet creates and returns a reference to an empty set.
-func NewIStringSet(values ...string) *IStringSet {
-	set := &IStringSet{
-		m: make(map[string]struct{}),
+// NewUintSet creates and returns a reference to an empty set.
+func NewUintSet(values ...uint) *UintSet {
+	set := &UintSet{
+		m: make(map[uint]struct{}),
 	}
 	for _, i := range values {
 		set.m[i] = struct{}{}
@@ -32,28 +32,96 @@ func NewIStringSet(values ...string) *IStringSet {
 	return set
 }
 
-// ConvertIStringSet constructs a new set containing the supplied values, if any.
+// ConvertUintSet constructs a new set containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
 // The returned set will contain all the values that were correctly converted.
-func ConvertIStringSet(values ...interface{}) (*IStringSet, bool) {
-	set := NewIStringSet()
+func ConvertUintSet(values ...interface{}) (*UintSet, bool) {
+	set := NewUintSet()
 
 	for _, i := range values {
 		switch j := i.(type) {
-		case string:
-			set.m[j] = struct{}{}
-		case *string:
-			set.m[*j] = struct{}{}
+		case int:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *int:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case int8:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *int8:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case int16:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *int16:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case int32:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *int32:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case int64:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *int64:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case uint:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *uint:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case uint8:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *uint8:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case uint16:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *uint16:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case uint32:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *uint32:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case uint64:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *uint64:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case float32:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *float32:
+			k := uint(*j)
+			set.m[k] = struct{}{}
+		case float64:
+			k := uint(j)
+			set.m[k] = struct{}{}
+		case *float64:
+			k := uint(*j)
+			set.m[k] = struct{}{}
 		}
 	}
 
 	return set, len(set.m) == len(values)
 }
 
-// BuildIStringSetFromChan constructs a new IStringSet from a channel that supplies a sequence
+// BuildUintSetFromChan constructs a new UintSet from a channel that supplies a sequence
 // of values until it is closed. The function doesn't return until then.
-func BuildIStringSetFromChan(source <-chan string) *IStringSet {
-	set := NewIStringSet()
+func BuildUintSetFromChan(source <-chan uint) *UintSet {
+	set := NewUintSet()
 	for v := range source {
 		set.m[v] = struct{}{}
 	}
@@ -63,39 +131,39 @@ func BuildIStringSetFromChan(source <-chan string) *IStringSet {
 //-------------------------------------------------------------------------------------------------
 
 // IsSequence returns true for lists and queues.
-func (set *IStringSet) IsSequence() bool {
+func (set *UintSet) IsSequence() bool {
 	return false
 }
 
 // IsSet returns false for lists or queues.
-func (set *IStringSet) IsSet() bool {
+func (set *UintSet) IsSet() bool {
 	return true
 }
 
 // ToList returns the elements of the set as a list. The returned list is a shallow
 // copy; the set is not altered.
-func (set *IStringSet) ToList() *IStringList {
+func (set *UintSet) ToList() *UintList {
 	if set == nil {
 		return nil
 	}
 
-	return &IStringList{
+	return &UintList{
 		m: set.ToSlice(),
 	}
 }
 
 // ToSet returns the set; this is an identity operation in this case.
-func (set *IStringSet) ToSet() *IStringSet {
+func (set *UintSet) ToSet() *UintSet {
 	return set
 }
 
 // ToSlice returns the elements of the current set as a slice.
-func (set *IStringSet) ToSlice() []string {
+func (set *UintSet) ToSlice() []uint {
 	if set == nil {
 		return nil
 	}
 
-	s := make([]string, 0, len(set.m))
+	s := make([]uint, 0, len(set.m))
 	for v := range set.m {
 		s = append(s, v)
 	}
@@ -103,7 +171,7 @@ func (set *IStringSet) ToSlice() []string {
 }
 
 // ToInterfaceSlice returns the elements of the current set as a slice of arbitrary type.
-func (set *IStringSet) ToInterfaceSlice() []interface{} {
+func (set *UintSet) ToInterfaceSlice() []interface{} {
 
 	s := make([]interface{}, 0, len(set.m))
 	for v := range set.m {
@@ -113,24 +181,24 @@ func (set *IStringSet) ToInterfaceSlice() []interface{} {
 }
 
 // Clone returns the same set, which is immutable.
-func (set *IStringSet) Clone() *IStringSet {
+func (set *UintSet) Clone() *UintSet {
 	return set
 }
 
 //-------------------------------------------------------------------------------------------------
 
 // IsEmpty returns true if the set is empty.
-func (set *IStringSet) IsEmpty() bool {
+func (set *UintSet) IsEmpty() bool {
 	return set.Size() == 0
 }
 
 // NonEmpty returns true if the set is not empty.
-func (set *IStringSet) NonEmpty() bool {
+func (set *UintSet) NonEmpty() bool {
 	return set.Size() > 0
 }
 
 // Size returns how many items are currently in the set. This is a synonym for Cardinality.
-func (set *IStringSet) Size() int {
+func (set *UintSet) Size() int {
 	if set == nil {
 		return 0
 	}
@@ -139,7 +207,7 @@ func (set *IStringSet) Size() int {
 }
 
 // Cardinality returns how many items are currently in the set. This is a synonym for Size.
-func (set *IStringSet) Cardinality() int {
+func (set *UintSet) Cardinality() int {
 	return set.Size()
 }
 
@@ -147,8 +215,8 @@ func (set *IStringSet) Cardinality() int {
 
 // Add returns a new set with all original items and all in `more`.
 // The original set is not altered.
-func (set *IStringSet) Add(more ...string) *IStringSet {
-	newSet := NewIStringSet()
+func (set *UintSet) Add(more ...uint) *UintSet {
+	newSet := NewUintSet()
 
 	for v := range set.m {
 		newSet.doAdd(v)
@@ -161,12 +229,12 @@ func (set *IStringSet) Add(more ...string) *IStringSet {
 	return newSet
 }
 
-func (set *IStringSet) doAdd(i string) {
+func (set *UintSet) doAdd(i uint) {
 	set.m[i] = struct{}{}
 }
 
 // Contains determines whether a given item is already in the set, returning true if so.
-func (set *IStringSet) Contains(i string) bool {
+func (set *UintSet) Contains(i uint) bool {
 	if set == nil {
 		return false
 	}
@@ -176,7 +244,7 @@ func (set *IStringSet) Contains(i string) bool {
 }
 
 // ContainsAll determines whether a given item is already in the set, returning true if so.
-func (set *IStringSet) ContainsAll(i ...string) bool {
+func (set *UintSet) ContainsAll(i ...uint) bool {
 	if set == nil {
 		return false
 	}
@@ -192,7 +260,7 @@ func (set *IStringSet) ContainsAll(i ...string) bool {
 //-------------------------------------------------------------------------------------------------
 
 // IsSubset determines whether every item in the other set is in this set, returning true if so.
-func (set *IStringSet) IsSubset(other *IStringSet) bool {
+func (set *UintSet) IsSubset(other *UintSet) bool {
 	if set.IsEmpty() {
 		return !other.IsEmpty()
 	}
@@ -210,12 +278,12 @@ func (set *IStringSet) IsSubset(other *IStringSet) bool {
 }
 
 // IsSuperset determines whether every item of this set is in the other set, returning true if so.
-func (set *IStringSet) IsSuperset(other *IStringSet) bool {
+func (set *UintSet) IsSuperset(other *UintSet) bool {
 	return other.IsSubset(set)
 }
 
 // Union returns a new set with all items in both sets.
-func (set *IStringSet) Union(other *IStringSet) *IStringSet {
+func (set *UintSet) Union(other *UintSet) *UintSet {
 	if set == nil {
 		return other
 	}
@@ -224,7 +292,7 @@ func (set *IStringSet) Union(other *IStringSet) *IStringSet {
 		return set
 	}
 
-	unionedSet := NewIStringSet()
+	unionedSet := NewUintSet()
 
 	for v := range set.m {
 		unionedSet.doAdd(v)
@@ -238,12 +306,12 @@ func (set *IStringSet) Union(other *IStringSet) *IStringSet {
 }
 
 // Intersect returns a new set with items that exist only in both sets.
-func (set *IStringSet) Intersect(other *IStringSet) *IStringSet {
+func (set *UintSet) Intersect(other *UintSet) *UintSet {
 	if set == nil || other == nil {
 		return nil
 	}
 
-	intersection := NewIStringSet()
+	intersection := NewUintSet()
 
 	// loop over smaller set
 	if set.Size() < other.Size() {
@@ -264,7 +332,7 @@ func (set *IStringSet) Intersect(other *IStringSet) *IStringSet {
 }
 
 // Difference returns a new set with items in the current set but not in the other set
-func (set *IStringSet) Difference(other *IStringSet) *IStringSet {
+func (set *UintSet) Difference(other *UintSet) *UintSet {
 	if set == nil {
 		return nil
 	}
@@ -273,7 +341,7 @@ func (set *IStringSet) Difference(other *IStringSet) *IStringSet {
 		return set
 	}
 
-	differencedSet := NewIStringSet()
+	differencedSet := NewUintSet()
 
 	for v := range set.m {
 		if !other.Contains(v) {
@@ -285,19 +353,19 @@ func (set *IStringSet) Difference(other *IStringSet) *IStringSet {
 }
 
 // SymmetricDifference returns a new set with items in the current set or the other set but not in both.
-func (set *IStringSet) SymmetricDifference(other *IStringSet) *IStringSet {
+func (set *UintSet) SymmetricDifference(other *UintSet) *UintSet {
 	aDiff := set.Difference(other)
 	bDiff := other.Difference(set)
 	return aDiff.Union(bDiff)
 }
 
 // Remove removes a single item from the set. A new set is returned that has all the elements except the removed one.
-func (set *IStringSet) Remove(i string) *IStringSet {
+func (set *UintSet) Remove(i uint) *UintSet {
 	if set == nil {
 		return nil
 	}
 
-	clonedSet := NewIStringSet()
+	clonedSet := NewUintSet()
 
 	for v := range set.m {
 		if i != v {
@@ -312,8 +380,8 @@ func (set *IStringSet) Remove(i string) *IStringSet {
 
 // Send returns a channel that will send all the elements in order.
 // A goroutine is created to send the elements; this only terminates when all the elements have been consumed
-func (set *IStringSet) Send() <-chan string {
-	ch := make(chan string)
+func (set *UintSet) Send() <-chan uint {
+	ch := make(chan uint)
 	go func() {
 		if set != nil {
 			for v := range set.m {
@@ -334,7 +402,7 @@ func (set *IStringSet) Send() <-chan string {
 //
 // Note that this method can also be used simply as a way to visit every element using a function
 // with some side-effects; such a function must always return true.
-func (set *IStringSet) Forall(p func(string) bool) bool {
+func (set *UintSet) Forall(p func(uint) bool) bool {
 	if set == nil {
 		return true
 	}
@@ -350,7 +418,7 @@ func (set *IStringSet) Forall(p func(string) bool) bool {
 // Exists applies a predicate p to every element in the set. If the function returns true,
 // the iteration terminates early. The returned value is true if an early return occurred.
 // or false if all elements were visited without finding a match.
-func (set *IStringSet) Exists(p func(string) bool) bool {
+func (set *UintSet) Exists(p func(uint) bool) bool {
 	if set == nil {
 		return false
 	}
@@ -363,8 +431,8 @@ func (set *IStringSet) Exists(p func(string) bool) bool {
 	return false
 }
 
-// Foreach iterates over stringSet and executes the function f against each element.
-func (set *IStringSet) Foreach(f func(string)) {
+// Foreach iterates over uintSet and executes the function f against each element.
+func (set *UintSet) Foreach(f func(uint)) {
 	if set == nil {
 		return
 	}
@@ -376,9 +444,9 @@ func (set *IStringSet) Foreach(f func(string)) {
 
 //-------------------------------------------------------------------------------------------------
 
-// Find returns the first string that returns true for the predicate p. If there are many matches
+// Find returns the first uint that returns true for the predicate p. If there are many matches
 // one is arbtrarily chosen. False is returned if none match.
-func (set *IStringSet) Find(p func(string) bool) (string, bool) {
+func (set *UintSet) Find(p func(uint) bool) (uint, bool) {
 
 	for v := range set.m {
 		if p(v) {
@@ -386,17 +454,17 @@ func (set *IStringSet) Find(p func(string) bool) (string, bool) {
 		}
 	}
 
-	var empty string
+	var empty uint
 	return empty, false
 }
 
-// Filter returns a new IStringSet whose elements return true for the predicate p.
-func (set *IStringSet) Filter(p func(string) bool) *IStringSet {
+// Filter returns a new UintSet whose elements return true for the predicate p.
+func (set *UintSet) Filter(p func(uint) bool) *UintSet {
 	if set == nil {
 		return nil
 	}
 
-	result := NewIStringSet()
+	result := NewUintSet()
 
 	for v := range set.m {
 		if p(v) {
@@ -406,17 +474,17 @@ func (set *IStringSet) Filter(p func(string) bool) *IStringSet {
 	return result
 }
 
-// Partition returns two new stringSets whose elements return true or false for the predicate, p.
+// Partition returns two new uintSets whose elements return true or false for the predicate, p.
 // The first result consists of all elements that satisfy the predicate and the second result consists of
 // all elements that don't. The relative order of the elements in the results is the same as in the
 // original list.
-func (set *IStringSet) Partition(p func(string) bool) (*IStringSet, *IStringSet) {
+func (set *UintSet) Partition(p func(uint) bool) (*UintSet, *UintSet) {
 	if set == nil {
 		return nil, nil
 	}
 
-	matching := NewIStringSet()
-	others := NewIStringSet()
+	matching := NewUintSet()
+	others := NewUintSet()
 
 	for v := range set.m {
 		if p(v) {
@@ -428,16 +496,16 @@ func (set *IStringSet) Partition(p func(string) bool) (*IStringSet, *IStringSet)
 	return matching, others
 }
 
-// Map returns a new IStringSet by transforming every element with a function f.
+// Map returns a new UintSet by transforming every element with a function f.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (set *IStringSet) Map(f func(string) string) *IStringSet {
+func (set *UintSet) Map(f func(uint) uint) *UintSet {
 	if set == nil {
 		return nil
 	}
 
-	result := NewIStringSet()
+	result := NewUintSet()
 
 	for v := range set.m {
 		result.m[f(v)] = struct{}{}
@@ -446,17 +514,36 @@ func (set *IStringSet) Map(f func(string) string) *IStringSet {
 	return result
 }
 
-// FlatMap returns a new IStringSet by transforming every element with a function f that
-// returns zero or more items in a slice. The resulting set may have a different size to the original set.
+// MapToString returns a new []string by transforming every element with function f.
+// The resulting slice is the same size as the set.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (set *IStringSet) FlatMap(f func(string) []string) *IStringSet {
+func (set *UintSet) MapToString(f func(uint) string) []string {
 	if set == nil {
 		return nil
 	}
 
-	result := NewIStringSet()
+	result := make([]string, 0, len(set.m))
+
+	for v := range set.m {
+		result = append(result, f(v))
+	}
+
+	return result
+}
+
+// FlatMap returns a new UintSet by transforming every element with a function f that
+// returns zero or more items in a slice. The resulting set may have a different size to the original set.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (set *UintSet) FlatMap(f func(uint) []uint) *UintSet {
+	if set == nil {
+		return nil
+	}
+
+	result := NewUintSet()
 
 	for v := range set.m {
 		for _, x := range f(v) {
@@ -467,8 +554,27 @@ func (set *IStringSet) FlatMap(f func(string) []string) *IStringSet {
 	return result
 }
 
-// CountBy gives the number elements of IStringSet that return true for the predicate p.
-func (set *IStringSet) CountBy(p func(string) bool) (result int) {
+// FlatMapToString returns a new []string by transforming every element with function f that
+// returns zero or more items in a slice. The resulting slice may have a different size to the set.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (set *UintSet) FlatMapToString(f func(uint) []string) []string {
+	if set == nil {
+		return nil
+	}
+
+	result := make([]string, 0, len(set.m))
+
+	for v := range set.m {
+		result = append(result, f(v)...)
+	}
+
+	return result
+}
+
+// CountBy gives the number elements of UintSet that return true for the predicate p.
+func (set *UintSet) CountBy(p func(uint) bool) (result int) {
 
 	for v := range set.m {
 		if p(v) {
@@ -478,15 +584,52 @@ func (set *IStringSet) CountBy(p func(string) bool) (result int) {
 	return
 }
 
-// MinBy returns an element of IStringSet containing the minimum value, when compared to other elements
+//-------------------------------------------------------------------------------------------------
+// These methods are included when uint is ordered.
+
+// Min returns the first element containing the minimum value, when compared to other elements.
+// Panics if the collection is empty.
+func (set *UintSet) Min() uint {
+
+	var m uint
+	first := true
+	for v := range set.m {
+		if first {
+			m = v
+			first = false
+		} else if v < m {
+			m = v
+		}
+	}
+	return m
+}
+
+// Max returns the first element containing the maximum value, when compared to other elements.
+// Panics if the collection is empty.
+func (set *UintSet) Max() (result uint) {
+
+	var m uint
+	first := true
+	for v := range set.m {
+		if first {
+			m = v
+			first = false
+		} else if v > m {
+			m = v
+		}
+	}
+	return m
+}
+
+// MinBy returns an element of UintSet containing the minimum value, when compared to other elements
 // using a passed func defining ‘less’. In the case of multiple items being equally minimal, the first such
 // element is returned. Panics if there are no elements.
-func (set *IStringSet) MinBy(less func(string, string) bool) string {
+func (set *UintSet) MinBy(less func(uint, uint) bool) uint {
 	if set.IsEmpty() {
 		panic("Cannot determine the minimum of an empty set.")
 	}
 
-	var m string
+	var m uint
 	first := true
 	for v := range set.m {
 		if first {
@@ -499,15 +642,15 @@ func (set *IStringSet) MinBy(less func(string, string) bool) string {
 	return m
 }
 
-// MaxBy returns an element of IStringSet containing the maximum value, when compared to other elements
+// MaxBy returns an element of UintSet containing the maximum value, when compared to other elements
 // using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 // element is returned. Panics if there are no elements.
-func (set *IStringSet) MaxBy(less func(string, string) bool) string {
+func (set *UintSet) MaxBy(less func(uint, uint) bool) uint {
 	if set.IsEmpty() {
 		panic("Cannot determine the minimum of an empty set.")
 	}
 
-	var m string
+	var m uint
 	first := true
 	for v := range set.m {
 		if first {
@@ -521,11 +664,24 @@ func (set *IStringSet) MaxBy(less func(string, string) bool) string {
 }
 
 //-------------------------------------------------------------------------------------------------
+// These methods are included when uint is numeric.
+
+// Sum returns the sum of all the elements in the set.
+func (set *UintSet) Sum() uint {
+
+	sum := uint(0)
+	for v := range set.m {
+		sum = sum + v
+	}
+	return sum
+}
+
+//-------------------------------------------------------------------------------------------------
 
 // Equals determines whether two sets are equal to each other, returning true if so.
 // If they both are the same size and have the same items they are considered equal.
 // Order of items is not relevent for sets to be equal.
-func (set *IStringSet) Equals(other *IStringSet) bool {
+func (set *UintSet) Equals(other *UintSet) bool {
 	if set == nil {
 		return other == nil || other.IsEmpty()
 	}
@@ -550,7 +706,7 @@ func (set *IStringSet) Equals(other *IStringSet) bool {
 //-------------------------------------------------------------------------------------------------
 
 // StringList gets a list of strings that depicts all the elements.
-func (set *IStringSet) StringList() []string {
+func (set *UintSet) StringList() []string {
 
 	strings := make([]string, len(set.m))
 	i := 0
@@ -562,24 +718,24 @@ func (set *IStringSet) StringList() []string {
 }
 
 // String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
-func (set *IStringSet) String() string {
+func (set *UintSet) String() string {
 	return set.MkString3("[", ", ", "]")
 }
 
 // MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
-func (set *IStringSet) MkString(sep string) string {
+func (set *UintSet) MkString(sep string) string {
 	return set.MkString3("", sep, "")
 }
 
 // MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
-func (set *IStringSet) MkString3(before, between, after string) string {
+func (set *UintSet) MkString3(before, between, after string) string {
 	if set == nil {
 		return ""
 	}
 	return set.mkString3Bytes(before, between, after).String()
 }
 
-func (set *IStringSet) mkString3Bytes(before, between, after string) *bytes.Buffer {
+func (set *UintSet) mkString3Bytes(before, between, after string) *bytes.Buffer {
 	b := &bytes.Buffer{}
 	b.WriteString(before)
 	sep := ""
@@ -596,21 +752,21 @@ func (set *IStringSet) mkString3Bytes(before, between, after string) *bytes.Buff
 //-------------------------------------------------------------------------------------------------
 
 // UnmarshalJSON implements JSON decoding for this set type.
-func (set *IStringSet) UnmarshalJSON(b []byte) error {
+func (set *UintSet) UnmarshalJSON(b []byte) error {
 
-	values := make([]string, 0)
+	values := make([]uint, 0)
 	err := json.Unmarshal(b, &values)
 	if err != nil {
 		return err
 	}
 
-	s2 := NewIStringSet(values...)
+	s2 := NewUintSet(values...)
 	*set = *s2
 	return nil
 }
 
 // MarshalJSON implements JSON encoding for this set type.
-func (set *IStringSet) MarshalJSON() ([]byte, error) {
+func (set *UintSet) MarshalJSON() ([]byte, error) {
 
 	buf, err := json.Marshal(set.ToSlice())
 	return buf, err
@@ -618,7 +774,7 @@ func (set *IStringSet) MarshalJSON() ([]byte, error) {
 
 // StringMap renders the set as a map of strings. The value of each item in the set becomes stringified as a key in the
 // resulting map.
-func (set *IStringSet) StringMap() map[string]bool {
+func (set *UintSet) StringMap() map[string]bool {
 	if set == nil {
 		return nil
 	}
@@ -633,15 +789,15 @@ func (set *IStringSet) StringMap() map[string]bool {
 //-------------------------------------------------------------------------------------------------
 
 // GobDecode implements 'gob' decoding for this set type.
-// You must register string with the 'gob' package before this method is used.
-func (set *IStringSet) GobDecode(b []byte) error {
+// You must register uint with the 'gob' package before this method is used.
+func (set *UintSet) GobDecode(b []byte) error {
 	buf := bytes.NewBuffer(b)
 	return gob.NewDecoder(buf).Decode(&set.m)
 }
 
 // GobEncode implements 'gob' encoding for this list type.
-// You must register string with the 'gob' package before this method is used.
-func (set IStringSet) GobEncode() ([]byte, error) {
+// You must register uint with the 'gob' package before this method is used.
+func (set UintSet) GobEncode() ([]byte, error) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(set.m)
 	return buf.Bytes(), err

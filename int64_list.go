@@ -4,7 +4,7 @@
 // Generated from simple/list.tpl with Type=int64
 // options: Comparable:true Numeric:true Ordered:true Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true
-// by runtemplate v3.4.2
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -498,6 +498,25 @@ func (list Int64List) Map(f func(int64) int64) Int64List {
 	return result
 }
 
+// MapToString returns a new []string by transforming every element with function f.
+// The resulting slice is the same size as the list.
+// The list is not modified.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (list Int64List) MapToString(f func(int64) string) []string {
+	if list == nil {
+		return nil
+	}
+
+	result := make([]string, len(list))
+	for i, v := range list {
+		result[i] = f(v)
+	}
+
+	return result
+}
+
 // FlatMap returns a new Int64List by transforming every element with function f that
 // returns zero or more items in a slice. The resulting list may have a different size to the original list.
 // The original list is not modified.
@@ -507,6 +526,25 @@ func (list Int64List) Map(f func(int64) int64) Int64List {
 func (list Int64List) FlatMap(f func(int64) []int64) Int64List {
 	result := MakeInt64List(0, len(list))
 
+	for _, v := range list {
+		result = append(result, f(v)...)
+	}
+
+	return result
+}
+
+// FlatMapToString returns a new []string by transforming every element with function f that
+// returns zero or more items in a slice. The resulting slice may have a different size to the list.
+// The list is not modified.
+//
+// This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
+// this method appropriately.
+func (list Int64List) FlatMapToString(f func(int64) []string) []string {
+	if list == nil {
+		return nil
+	}
+
+	result := make([]string, 0, len(list))
 	for _, v := range list {
 		result = append(result, f(v)...)
 	}
@@ -664,7 +702,6 @@ func (sl sortableInt64List) Swap(i, j int) {
 // SortBy alters the list so that the elements are sorted by a specified ordering.
 // Sorting happens in-place; the modified list is returned.
 func (list Int64List) SortBy(less func(i, j int64) bool) Int64List {
-
 	sort.Sort(sortableInt64List{less, list})
 	return list
 }
@@ -673,7 +710,6 @@ func (list Int64List) SortBy(less func(i, j int64) bool) Int64List {
 // Sorting happens in-place; the modified list is returned.
 // The algorithm keeps the original order of equal elements.
 func (list Int64List) StableSortBy(less func(i, j int64) bool) Int64List {
-
 	sort.Stable(sortableInt64List{less, list})
 	return list
 }

@@ -1,24 +1,24 @@
-// Generated from immutable/collection.tpl with Type=int
-// options: Comparable:true Numeric:true Ordered:true Stringer:true Mutable:disabled
-// by runtemplate v3.4.2
+// Generated from simple/collection.tpl with Type=uint64
+// options: Comparable:true Numeric:true Ordered:true Stringer:true Mutable:always
+// by runtemplate v3.5.2
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
-package immutable
+package collection
 
-// IIntSizer defines an interface for sizing methods on int collections.
-type IIntSizer interface {
-	// IsEmpty tests whether IIntCollection is empty.
+// Uint64Sizer defines an interface for sizing methods on uint64 collections.
+type Uint64Sizer interface {
+	// IsEmpty tests whether Uint64Collection is empty.
 	IsEmpty() bool
 
-	// NonEmpty tests whether IIntCollection is empty.
+	// NonEmpty tests whether Uint64Collection is empty.
 	NonEmpty() bool
 
 	// Size returns the number of items in the list - an alias of Len().
 	Size() int
 }
 
-// IIntMkStringer defines an interface for stringer methods on int collections.
-type IIntMkStringer interface {
+// Uint64MkStringer defines an interface for stringer methods on uint64 collections.
+type Uint64MkStringer interface {
 	// String implements the Stringer interface to render the list as a comma-separated string enclosed
 	// in square brackets.
 	String() string
@@ -30,16 +30,19 @@ type IIntMkStringer interface {
 	MkString3(before, between, after string) string
 
 	// implements json.Marshaler interface {
-	MarshalJSON() ([]byte, error)
+	//MarshalJSON() ([]byte, error)
+
+	// implements json.Unmarshaler interface {
+	//UnmarshalJSON(b []byte) error
 
 	// StringList gets a list of strings that depicts all the elements.
 	StringList() []string
 }
 
-// IIntCollection defines an interface for common collection methods on int.
-type IIntCollection interface {
-	IIntSizer
-	IIntMkStringer
+// Uint64Collection defines an interface for common collection methods on uint64.
+type Uint64Collection interface {
+	Uint64Sizer
+	Uint64MkStringer
 
 	// IsSequence returns true for lists and queues.
 	IsSequence() bool
@@ -48,56 +51,59 @@ type IIntCollection interface {
 	IsSet() bool
 
 	// ToSet returns a shallow copy as a set.
-	ToSet() *IIntSet
+	ToSet() Uint64Set
 
 	// ToSlice returns a shallow copy as a plain slice.
-	ToSlice() []int
+	ToSlice() []uint64
 
 	// ToInterfaceSlice returns a shallow copy as a slice of arbitrary type.
 	ToInterfaceSlice() []interface{}
 
-	// Exists verifies that one or more elements of IIntCollection return true for the predicate p.
-	Exists(p func(int) bool) bool
+	// Exists verifies that one or more elements of Uint64Collection return true for the predicate p.
+	Exists(p func(uint64) bool) bool
 
-	// Forall verifies that all elements of IIntCollection return true for the predicate p.
-	Forall(p func(int) bool) bool
+	// Forall verifies that all elements of Uint64Collection return true for the predicate p.
+	Forall(p func(uint64) bool) bool
 
-	// Foreach iterates over IIntCollection and executes the function f against each element.
-	Foreach(f func(int))
+	// Foreach iterates over Uint64Collection and executes the function f against each element.
+	Foreach(f func(uint64))
 
-	// Find returns the first int that returns true for the predicate p.
+	// Find returns the first uint64 that returns true for the predicate p.
 	// False is returned if none match.
-	Find(p func(int) bool) (int, bool)
+	Find(p func(uint64) bool) (uint64, bool)
 
 	// Send returns a channel that will send all the elements in order. Can be used with the plumbing code, for example.
 	// A goroutine is created to send the elements; this only terminates when all the elements have been consumed
-	Send() <-chan int
+	Send() <-chan uint64
 
-	// CountBy gives the number elements of IIntCollection that return true for the predicate p.
-	CountBy(p func(int) bool) int
+	// CountBy gives the number elements of Uint64Collection that return true for the predicate p.
+	CountBy(p func(uint64) bool) int
 
 	// Contains determines whether a given item is already in the collection, returning true if so.
-	Contains(v int) bool
+	Contains(v uint64) bool
 
 	// ContainsAll determines whether the given items are all in the collection, returning true if so.
-	ContainsAll(v ...int) bool
+	ContainsAll(v ...uint64) bool
+
+	// Add adds items to the current collection.
+	//Add(more ...uint64)
 
 	// Min returns the minimum value of all the items in the collection. Panics if there are no elements.
-	Min() int
+	Min() uint64
 
 	// Max returns the minimum value of all the items in the collection. Panics if there are no elements.
-	Max() int
+	Max() uint64
 
-	// MinBy returns an element of IIntCollection containing the minimum value, when compared to other elements
+	// MinBy returns an element of Uint64Collection containing the minimum value, when compared to other elements
 	// using a passed func defining ‘less’. In the case of multiple items being equally minimal, the first such
 	// element is returned. Panics if there are no elements.
-	MinBy(less func(int, int) bool) int
+	MinBy(less func(uint64, uint64) bool) uint64
 
-	// MaxBy returns an element of IIntCollection containing the maximum value, when compared to other elements
+	// MaxBy returns an element of Uint64Collection containing the maximum value, when compared to other elements
 	// using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 	// element is returned. Panics if there are no elements.
-	MaxBy(less func(int, int) bool) int
+	MaxBy(less func(uint64, uint64) bool) uint64
 
 	// Sum returns the sum of all the elements in the collection.
-	Sum() int
+	Sum() uint64
 }
