@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/map.tpl with Key=string Type=interface{}
 // options: Comparable:<no value> Stringer:<no value> KeyList:<no value> ValueList:<no value> Mutable:always
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection

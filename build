@@ -4,7 +4,7 @@ BASE=$PWD
 
 FIRST=$(go env GOPATH | cut -d: -f1)
 PATH=$FIRST/bin:$PATH
-RVSN=v3.5.2
+RVSN=v3.5.4
 
 function getVersionedTool
 {
@@ -66,7 +66,9 @@ function generateGroup
     cd $BASE
 }
 
-rm -f *_*.go immutable/*_*.go
+for d in . immutable; do
+  rm -f $d/*_collection.go $d/*_list.go $d/*_map.go $d/*_set.go
+done
 
 generateGroup .         simple
 generateGroup immutable immutable

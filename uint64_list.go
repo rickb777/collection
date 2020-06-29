@@ -2,9 +2,9 @@
 // Not thread-safe.
 //
 // Generated from simple/list.tpl with Type=uint64
-// options: Comparable:true Numeric:true Ordered:true Stringer:true
-// GobEncode:true Mutable:always ToList:always ToSet:true
-// by runtemplate v3.5.2
+// options: Comparable:true Numeric:true Ordered:true StringLike:<no value> Stringer:true
+// GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -47,37 +47,85 @@ func ConvertUint64List(values ...interface{}) (Uint64List, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case int:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *int:
+			k := uint64(*j)
+			list = append(list, k)
 		case int8:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *int8:
+			k := uint64(*j)
+			list = append(list, k)
 		case int16:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *int16:
+			k := uint64(*j)
+			list = append(list, k)
 		case int32:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *int32:
+			k := uint64(*j)
+			list = append(list, k)
 		case int64:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *int64:
+			k := uint64(*j)
+			list = append(list, k)
 		case uint:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *uint:
+			k := uint64(*j)
+			list = append(list, k)
 		case uint8:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *uint8:
+			k := uint64(*j)
+			list = append(list, k)
 		case uint16:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *uint16:
+			k := uint64(*j)
+			list = append(list, k)
 		case uint32:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *uint32:
+			k := uint64(*j)
+			list = append(list, k)
 		case uint64:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *uint64:
+			k := uint64(*j)
+			list = append(list, k)
 		case float32:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *float32:
+			k := uint64(*j)
+			list = append(list, k)
 		case float64:
-			list = append(list, uint64(j))
+			k := uint64(j)
+			list = append(list, k)
+		case *float64:
+			k := uint64(*j)
+			list = append(list, k)
 		}
 	}
 
 	return list, len(list) == len(values)
 }
 
-// BuildUint64ListFromChan constructs a new Uint64List from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildUint64ListFromChan constructs a new Uint64List from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildUint64ListFromChan(source <-chan uint64) Uint64List {
 	list := MakeUint64List(0, 0)
 	for v := range source {

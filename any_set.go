@@ -4,7 +4,7 @@
 //
 // Generated from simple/set.tpl with Type=interface{}
 // options: Numeric:<no value> Stringer:<no value> Mutable:always
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -29,9 +29,11 @@ func ConvertAnySet(values ...interface{}) (AnySet, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case interface{}:
-			set[j] = struct{}{}
+			k := interface{}(j)
+			set[k] = struct{}{}
 		case *interface{}:
-			set[*j] = struct{}{}
+			k := interface{}(*j)
+			set[k] = struct{}{}
 		}
 	}
 

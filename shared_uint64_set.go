@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/set.tpl with Type=uint64
 // options: Comparable:always Numeric:true Ordered:true Stringer:true ToList:true
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection

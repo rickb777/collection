@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/set.tpl with Type=interface{}
 // options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:<no value> ToList:true
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -40,9 +40,11 @@ func ConvertSharedAnySet(values ...interface{}) (*SharedAnySet, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case interface{}:
-			set.m[j] = struct{}{}
+			k := interface{}(j)
+			set.m[k] = struct{}{}
 		case *interface{}:
-			set.m[*j] = struct{}{}
+			k := interface{}(*j)
+			set.m[k] = struct{}{}
 		}
 	}
 

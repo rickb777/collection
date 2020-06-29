@@ -4,7 +4,7 @@
 //
 // Generated from immutable/list.tpl with Type=interface{}
 // options: Comparable:<no value> Numeric:<no value> Ordered:<no value> Stringer:<no value> GobEncode:<no value> Mutable:disabled
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -49,9 +49,11 @@ func ConvertAnyList(values ...interface{}) (*AnyList, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case interface{}:
-			list.m = append(list.m, j)
+			k := interface{}(j)
+			list.m = append(list.m, k)
 		case *interface{}:
-			list.m = append(list.m, *j)
+			k := interface{}(*j)
+			list.m = append(list.m, k)
 		}
 	}
 

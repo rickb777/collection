@@ -4,7 +4,7 @@
 //
 // Generated from immutable/map.tpl with Key=uint Type=uint
 // options: Comparable:true Stringer:true KeyList:<no value> ValueList:<no value> Mutable:disabled
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable

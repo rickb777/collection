@@ -4,7 +4,7 @@
 //
 // Generated from immutable/list.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true GobEncode:true Mutable:disabled
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -53,9 +53,11 @@ func ConvertStringList(values ...interface{}) (*StringList, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case string:
-			list.m = append(list.m, j)
+			k := string(j)
+			list.m = append(list.m, k)
 		case *string:
-			list.m = append(list.m, *j)
+			k := string(*j)
+			list.m = append(list.m, k)
 		}
 	}
 

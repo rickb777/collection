@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/set.tpl with Type=string
 // options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true ToList:true
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -44,9 +44,11 @@ func ConvertSharedStringSet(values ...interface{}) (*SharedStringSet, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case string:
-			set.m[j] = struct{}{}
+			k := string(j)
+			set.m[k] = struct{}{}
 		case *string:
-			set.m[*j] = struct{}{}
+			k := string(*j)
+			set.m[k] = struct{}{}
 		}
 	}
 

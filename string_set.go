@@ -4,7 +4,7 @@
 //
 // Generated from simple/set.tpl with Type=string
 // options: Numeric:<no value> Stringer:true Mutable:always
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -35,9 +35,11 @@ func ConvertStringSet(values ...interface{}) (StringSet, bool) {
 	for _, i := range values {
 		switch j := i.(type) {
 		case string:
-			set[j] = struct{}{}
+			k := string(j)
+			set[k] = struct{}{}
 		case *string:
-			set[*j] = struct{}{}
+			k := string(*j)
+			set[k] = struct{}{}
 		}
 	}
 

@@ -2,9 +2,9 @@
 // Thread-safe.
 //
 // Generated from threadsafe/list.tpl with Type=uint
-// options: Comparable:true Numeric:true Ordered:true Stringer:true
+// options: Comparable:true Numeric:true Ordered:true StringLike:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
-// by runtemplate v3.5.2
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection

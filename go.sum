@@ -49,6 +49,8 @@ github.com/gobuffalo/envy v1.6.12 h1:zkhss8DXz/pty2HAyA8BnvWMTYxo4gjd4+WCnYovoxY
 github.com/gobuffalo/envy v1.6.12/go.mod h1:qJNrJhKkZpEW0glh5xP2syQHH5kgdmgsKss2Kk8PTP0=
 github.com/gobuffalo/envy v1.7.0 h1:GlXgaiBkmrYMHco6t4j7SacKO4XUjvh5pwXh0f4uxXU=
 github.com/gobuffalo/envy v1.7.0/go.mod h1:n7DRkBerg/aorDM8kbduw5dN3oXGswK5liaSCx4T5NI=
+github.com/gobuffalo/envy v1.7.1 h1:OQl5ys5MBea7OGCdvPbBJWRgnhC/fGona6QKfvFeau8=
+github.com/gobuffalo/envy v1.7.1/go.mod h1:FurDp9+EDPE4aIUS3ZLyD+7/9fpx7YRt/ukY6jIHf0w=
 github.com/gobuffalo/events v1.0.3/go.mod h1:Txo8WmqScapa7zimEQIwgiJBvMECMe9gJjsKNPN3uZw=
 github.com/gobuffalo/events v1.0.7/go.mod h1:z8txf6H9jWhQ5Scr7YPLWg/cgXBRj8Q4uYI+rsVCCSQ=
 github.com/gobuffalo/events v1.0.8/go.mod h1:A5KyqT1sA+3GJiBE4QKZibse9mtOcI9nw8gGrDdqYGs=
@@ -281,11 +283,17 @@ github.com/rickb777/runtemplate/v3 v3.5.1 h1:EQ9exDulpvUfXVrds+/Ylkd85SFGsgjlwrd
 github.com/rickb777/runtemplate/v3 v3.5.1/go.mod h1:y7Eli64kpbCDDxVX13lFVKiJHXUeolv6+0Yk7wz9uwA=
 github.com/rickb777/runtemplate/v3 v3.5.2 h1:xDZAQ7qU4m0n0xyiSb4Kbh92zsWSRLDf6eS6HOHdmd4=
 github.com/rickb777/runtemplate/v3 v3.5.2/go.mod h1:y7Eli64kpbCDDxVX13lFVKiJHXUeolv6+0Yk7wz9uwA=
+github.com/rickb777/runtemplate/v3 v3.5.3 h1:C+giGGZ5cm7oc0p4Q6X1Bls//54Swg03zbzJXP1RgRI=
+github.com/rickb777/runtemplate/v3 v3.5.3/go.mod h1:e7/XbnwuISJKmFS6cJ18tfQ+llQEhrcQwgjurNa2Gto=
+github.com/rickb777/runtemplate/v3 v3.5.4 h1:Mh5++xyTPZY257WkCyRj8g28NDj3VQ5bcEavTSWlJGs=
+github.com/rickb777/runtemplate/v3 v3.5.4/go.mod h1:8b30uPUenvvnN94neg3qNnar3d03FeJfhrF1hHDX/yM=
 github.com/rogpeppe/go-internal v1.0.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.1.0 h1:g0fH8RicVgNl+zVZDCDfbdWxAWoAEJyI7I3TZYXFiig=
 github.com/rogpeppe/go-internal v1.1.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.0 h1:RR9dF3JtopPvtkroDZuVD7qquD0bnHlKSqaQhgwt8yk=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
+github.com/rogpeppe/go-internal v1.3.2 h1:XU784Pr0wdahMY2bYcyK6N1KuaRAdLtqD4qd8D18Bfs=
+github.com/rogpeppe/go-internal v1.3.2/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/russross/blackfriday v1.5.2/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/serenize/snaker v0.0.0-20171204205717-a683aaf2d516/go.mod h1:Yow6lPLSAXx2ifx470yD/nUe22Dv5vBvxK/UK9UUTVs=
@@ -321,6 +329,7 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/unrolled/secure v0.0.0-20180918153822-f340ee86eb8b/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
 github.com/unrolled/secure v0.0.0-20181005190816-ff9db2ff917f/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
@@ -386,6 +395,7 @@ golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20190422165155-953cdadca894/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20190515120540-06a5c4944438/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
+golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20181003024731-2f84ea8ef872/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20181006002542-f60d9635b16a/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=

@@ -2,9 +2,9 @@
 // Not thread-safe.
 //
 // Generated from simple/list.tpl with Type=string
-// options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true
-// GobEncode:true Mutable:always ToList:always ToSet:true
-// by runtemplate v3.5.2
+// options: Comparable:true Numeric:<no value> Ordered:<no value> StringLike:<no value> Stringer:true
+// GobEncode:true Mutable:always ToList:always ToSet:true MapTo:int
+// by runtemplate v3.5.4
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -56,8 +56,8 @@ func ConvertStringList(values ...interface{}) (StringList, bool) {
 	return list, len(list) == len(values)
 }
 
-// BuildStringListFromChan constructs a new StringList from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildStringListFromChan constructs a new StringList from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildStringListFromChan(source <-chan string) StringList {
 	list := MakeStringList(0, 0)
 	for v := range source {
