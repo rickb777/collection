@@ -87,6 +87,8 @@ github.com/rickb777/runtemplate/v3 v3.6.0 h1:Ac/YrvhBCQSNU5Kxgx/N+u1J/9MHOJhOn0e
 github.com/rickb777/runtemplate/v3 v3.6.0/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
 github.com/rickb777/runtemplate/v3 v3.6.1 h1:OH1XIxBEN50UI5wYcMbo7uzhfiC8HrjfZMqXgxJNlug=
 github.com/rickb777/runtemplate/v3 v3.6.1/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
+github.com/rickb777/runtemplate/v3 v3.7.0 h1:EsoTsvjTJiIBGCvuz7o00XcJNcOACxI6gOtRkj31wYY=
+github.com/rickb777/runtemplate/v3 v3.7.0/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
 github.com/rogpeppe/go-internal v1.1.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.2/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=

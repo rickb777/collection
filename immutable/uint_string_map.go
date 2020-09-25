@@ -4,7 +4,7 @@
 //
 // Generated from immutable/map.tpl with Key=uint Type=string
 // options: Comparable:true Stringer:true KeyList:collection.UintList ValueList:collection.StringList Mutable:disabled
-// by runtemplate v3.6.1
+// by runtemplate v3.7.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -396,29 +396,25 @@ func (mm *UintStringMap) Clone() *UintStringMap {
 
 //-------------------------------------------------------------------------------------------------
 
+// String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
 func (mm *UintStringMap) String() string {
-	return mm.MkString3("[", ", ", "]")
+	return mm.MkString4("[", ", ", "]", ":")
 }
-
-// implements encoding.Marshaler interface {
-//func (mm *UintStringMap) MarshalJSON() ([]byte, error) {
-//	return mm.mkString3Bytes("{\"", "\", \"", "\"}").Bytes(), nil
-//}
 
 // MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
 func (mm *UintStringMap) MkString(sep string) string {
-	return mm.MkString3("", sep, "")
+	return mm.MkString4("", sep, "", ":")
 }
 
-// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
-func (mm *UintStringMap) MkString3(before, between, after string) string {
+// MkString4 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (mm *UintStringMap) MkString4(before, between, after, equals string) string {
 	if mm == nil {
 		return ""
 	}
-	return mm.mkString3Bytes(before, between, after).String()
+	return mm.mkString4Bytes(before, between, after, equals).String()
 }
 
-func (mm *UintStringMap) mkString3Bytes(before, between, after string) *strings.Builder {
+func (mm *UintStringMap) mkString4Bytes(before, between, after, equals string) *strings.Builder {
 	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
@@ -432,7 +428,7 @@ func (mm *UintStringMap) mkString3Bytes(before, between, after string) *strings.
 	for _, k := range keys {
 		v := mm.m[k]
 		b.WriteString(sep)
-		b.WriteString(fmt.Sprintf("%v:%v", k, v))
+		fmt.Fprintf(b, "%v%s%v", k, equals, v)
 		sep = between
 	}
 
@@ -449,7 +445,7 @@ func (mm *UintStringMap) GobDecode(b []byte) error {
 	return gob.NewDecoder(buf).Decode(&mm.m)
 }
 
-// GobEncode implements 'gob' encoding for this list type.
+// GobEncode implements 'gob' encoding for this map type.
 // You must register string with the 'gob' package before this method is used.
 func (mm *UintStringMap) GobEncode() ([]byte, error) {
 	buf := &bytes.Buffer{}
@@ -460,29 +456,28 @@ func (mm *UintStringMap) GobEncode() ([]byte, error) {
 //-------------------------------------------------------------------------------------------------
 
 func (ts UintStringTuples) String() string {
-	return ts.MkString3("[", ", ", "]")
+	return ts.MkString4("[", ", ", "]", ":")
 }
 
 // MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
 func (ts UintStringTuples) MkString(sep string) string {
-	return ts.MkString3("", sep, "")
+	return ts.MkString4("", sep, "", ":")
 }
 
-// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
-func (ts UintStringTuples) MkString3(before, between, after string) string {
+// MkString4 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts UintStringTuples) MkString4(before, between, after, equals string) string {
 	if ts == nil {
 		return ""
 	}
-	return ts.mkString3Bytes(before, between, after).String()
+	return ts.mkString4Bytes(before, between, after, equals).String()
 }
 
-func (ts UintStringTuples) mkString3Bytes(before, between, after string) *strings.Builder {
+func (ts UintStringTuples) mkString4Bytes(before, between, after, equals string) *strings.Builder {
 	b := &strings.Builder{}
-	b.WriteString(before)
-	sep := ""
+	sep := before
 	for _, t := range ts {
 		b.WriteString(sep)
-		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		fmt.Fprintf(b, "%v%s%v", t.Key, equals, t.Val)
 		sep = between
 	}
 	b.WriteString(after)

@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/map.tpl with Key=int64 Type=int64
 // options: Comparable:true Stringer:true KeyList:collection.Int64List ValueList:collection.Int64List Mutable:always
-// by runtemplate v3.6.1
+// by runtemplate v3.7.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
@@ -514,29 +514,25 @@ func (mm *Int64Int64Map) Clone() *Int64Int64Map {
 
 //-------------------------------------------------------------------------------------------------
 
+// String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
 func (mm *Int64Int64Map) String() string {
-	return mm.MkString3("[", ", ", "]")
+	return mm.MkString4("[", ", ", "]", ":")
 }
-
-// implements encoding.Marshaler interface {
-//func (mm *Int64Int64Map) MarshalJSON() ([]byte, error) {
-//	return mm.mkString3Bytes("{\"", "\", \"", "\"}").Bytes(), nil
-//}
 
 // MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
 func (mm *Int64Int64Map) MkString(sep string) string {
-	return mm.MkString3("", sep, "")
+	return mm.MkString4("", sep, "", ":")
 }
 
-// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
-func (mm *Int64Int64Map) MkString3(before, between, after string) string {
+// MkString4 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (mm *Int64Int64Map) MkString4(before, between, after, equals string) string {
 	if mm == nil {
 		return ""
 	}
-	return mm.mkString3Bytes(before, between, after).String()
+	return mm.mkString4Bytes(before, between, after, equals).String()
 }
 
-func (mm *Int64Int64Map) mkString3Bytes(before, between, after string) *strings.Builder {
+func (mm *Int64Int64Map) mkString4Bytes(before, between, after, equals string) *strings.Builder {
 	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
@@ -552,7 +548,7 @@ func (mm *Int64Int64Map) mkString3Bytes(before, between, after string) *strings.
 	for _, k := range keys {
 		v := mm.m[k]
 		b.WriteString(sep)
-		b.WriteString(fmt.Sprintf("%v:%v", k, v))
+		fmt.Fprintf(b, "%v%s%v", k, equals, v)
 		sep = between
 	}
 
@@ -586,29 +582,28 @@ func (mm *Int64Int64Map) GobEncode() ([]byte, error) {
 //-------------------------------------------------------------------------------------------------
 
 func (ts Int64Int64Tuples) String() string {
-	return ts.MkString3("[", ", ", "]")
+	return ts.MkString4("[", ", ", "]", ":")
 }
 
 // MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
 func (ts Int64Int64Tuples) MkString(sep string) string {
-	return ts.MkString3("", sep, "")
+	return ts.MkString4("", sep, "", ":")
 }
 
-// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
-func (ts Int64Int64Tuples) MkString3(before, between, after string) string {
+// MkString4 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts Int64Int64Tuples) MkString4(before, between, after, equals string) string {
 	if ts == nil {
 		return ""
 	}
-	return ts.mkString3Bytes(before, between, after).String()
+	return ts.mkString4Bytes(before, between, after, equals).String()
 }
 
-func (ts Int64Int64Tuples) mkString3Bytes(before, between, after string) *strings.Builder {
+func (ts Int64Int64Tuples) mkString4Bytes(before, between, after, equals string) *strings.Builder {
 	b := &strings.Builder{}
-	b.WriteString(before)
-	sep := ""
+	sep := before
 	for _, t := range ts {
 		b.WriteString(sep)
-		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		fmt.Fprintf(b, "%v%s%v", t.Key, equals, t.Val)
 		sep = between
 	}
 	b.WriteString(after)

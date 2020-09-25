@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/set.tpl with Type=string
 // options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true ToList:true
-// by runtemplate v3.6.1
+// by runtemplate v3.7.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
