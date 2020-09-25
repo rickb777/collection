@@ -1,6 +1,6 @@
 // Generated from simple/collection.tpl with Type=interface{}
-// options: Comparable:<no value> Numeric:<no value> Ordered:<no value> Stringer:<no value> Mutable:always
-// by runtemplate v3.5.4
+// options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true Mutable:always
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -17,9 +17,32 @@ type AnySizer interface {
 	Size() int
 }
 
+// AnyMkStringer defines an interface for stringer methods on interface{} collections.
+type AnyMkStringer interface {
+	// String implements the Stringer interface to render the list as a comma-separated string enclosed
+	// in square brackets.
+	String() string
+
+	// MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
+	MkString(sep string) string
+
+	// MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
+	MkString3(before, between, after string) string
+
+	// implements json.Marshaler interface {
+	//MarshalJSON() ([]byte, error)
+
+	// implements json.Unmarshaler interface {
+	//UnmarshalJSON(b []byte) error
+
+	// StringList gets a list of strings that depicts all the elements.
+	StringList() []string
+}
+
 // AnyCollection defines an interface for common collection methods on interface{}.
 type AnyCollection interface {
 	AnySizer
+	AnyMkStringer
 
 	// IsSequence returns true for lists and queues.
 	IsSequence() bool
@@ -55,6 +78,12 @@ type AnyCollection interface {
 
 	// CountBy gives the number elements of AnyCollection that return true for the predicate p.
 	CountBy(p func(interface{}) bool) int
+
+	// Contains determines whether a given item is already in the collection, returning true if so.
+	Contains(v interface{}) bool
+
+	// ContainsAll determines whether the given items are all in the collection, returning true if so.
+	ContainsAll(v ...interface{}) bool
 
 	// Add adds items to the current collection.
 	//Add(more ...interface{})

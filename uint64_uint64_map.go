@@ -3,14 +3,15 @@
 // Not thread-safe.
 //
 // Generated from simple/map.tpl with Key=uint64 Type=uint64
-// options: Comparable:true Stringer:true KeyList:<no value> ValueList:<no value> Mutable:always
-// by runtemplate v3.5.4
+// options: Comparable:true Stringer:true KeyList:Uint64List ValueList:Uint64List Mutable:always
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -63,6 +64,11 @@ func (ts Uint64Uint64Tuples) Values(values ...uint64) Uint64Uint64Tuples {
 	return ts
 }
 
+// ToMap converts the tuples to a map.
+func (ts Uint64Uint64Tuples) ToMap() Uint64Uint64Map {
+	return NewUint64Uint64Map(ts...)
+}
+
 //-------------------------------------------------------------------------------------------------
 
 func newUint64Uint64Map() Uint64Uint64Map {
@@ -86,8 +92,12 @@ func NewUint64Uint64Map(kv ...Uint64Uint64Tuple) Uint64Uint64Map {
 }
 
 // Keys returns the keys of the current map as a slice.
-func (mm Uint64Uint64Map) Keys() []uint64 {
-	s := make([]uint64, 0, len(mm))
+func (mm Uint64Uint64Map) Keys() Uint64List {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(Uint64List, 0, len(mm))
 	for k := range mm {
 		s = append(s, k)
 	}
@@ -95,8 +105,12 @@ func (mm Uint64Uint64Map) Keys() []uint64 {
 }
 
 // Values returns the values of the current map as a slice.
-func (mm Uint64Uint64Map) Values() []uint64 {
-	s := make([]uint64, 0, len(mm))
+func (mm Uint64Uint64Map) Values() Uint64List {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(Uint64List, 0, len(mm))
 	for _, v := range mm {
 		s = append(s, v)
 	}
@@ -104,17 +118,29 @@ func (mm Uint64Uint64Map) Values() []uint64 {
 }
 
 // slice returns the internal elements of the map. This is a seam for testing etc.
-func (mm Uint64Uint64Map) slice() []Uint64Uint64Tuple {
-	s := make([]Uint64Uint64Tuple, 0, len(mm))
+func (mm Uint64Uint64Map) slice() Uint64Uint64Tuples {
+	s := make(Uint64Uint64Tuples, 0, len(mm))
 	for k, v := range mm {
 		s = append(s, Uint64Uint64Tuple{(k), v})
 	}
 	return s
 }
 
-// ToSlice returns the key/value pairs as a slice
-func (mm Uint64Uint64Map) ToSlice() []Uint64Uint64Tuple {
+// ToSlice returns the key/value pairs as a slice.
+func (mm Uint64Uint64Map) ToSlice() Uint64Uint64Tuples {
 	return mm.slice()
+}
+
+// OrderedSlice returns the key/value pairs as a slice in the order specified by keys.
+func (mm Uint64Uint64Map) OrderedSlice(keys Uint64List) Uint64Uint64Tuples {
+	s := make(Uint64Uint64Tuples, 0, len(mm))
+	for _, k := range keys {
+		v, found := mm[k]
+		if found {
+			s = append(s, Uint64Uint64Tuple{k, v})
+		}
+	}
+	return s
 }
 
 // Get returns one of the items in the map, if present.
@@ -360,7 +386,14 @@ func (mm Uint64Uint64Map) mkString3Bytes(before, between, after string) *bytes.B
 	b.WriteString(before)
 	sep := ""
 
-	for k, v := range mm {
+	keys := make(Uint64List, 0, len(mm))
+	for k, _ := range mm {
+		keys = append(keys, k)
+	}
+	keys.Sorted()
+
+	for _, k := range keys {
+		v := mm[k]
 		b.WriteString(sep)
 		b.WriteString(fmt.Sprintf("%v:%v", k, v))
 		sep = between
@@ -368,4 +401,49 @@ func (mm Uint64Uint64Map) mkString3Bytes(before, between, after string) *bytes.B
 
 	b.WriteString(after)
 	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+func (ts Uint64Uint64Tuples) String() string {
+	return ts.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (ts Uint64Uint64Tuples) MkString(sep string) string {
+	return ts.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts Uint64Uint64Tuples) MkString3(before, between, after string) string {
+	if ts == nil {
+		return ""
+	}
+	return ts.mkString3Bytes(before, between, after).String()
+}
+
+func (ts Uint64Uint64Tuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for _, t := range ts {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this tuple type.
+func (t Uint64Uint64Tuple) UnmarshalJSON(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return json.NewDecoder(buf).Decode(&t)
+}
+
+// MarshalJSON implements encoding.Marshaler interface.
+func (t Uint64Uint64Tuple) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"key":"%v", "val":"%v"}`, t.Key, t.Val)), nil
 }

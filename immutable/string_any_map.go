@@ -3,14 +3,18 @@
 //
 //
 // Generated from immutable/map.tpl with Key=string Type=interface{}
-// options: Comparable:<no value> Stringer:<no value> KeyList:<no value> ValueList:<no value> Mutable:disabled
-// by runtemplate v3.5.4
+// options: Comparable:true Stringer:true KeyList:collection.StringList ValueList:collection.AnyList Mutable:disabled
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
 
 import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
 	"fmt"
+	"github.com/rickb777/collection"
 )
 
 // StringAnyMap is the primary type that represents a thread-safe map
@@ -64,6 +68,11 @@ func (ts StringAnyTuples) Values(values ...interface{}) StringAnyTuples {
 	return ts
 }
 
+// ToMap converts the tuples to a map.
+func (ts StringAnyTuples) ToMap() *StringAnyMap {
+	return NewStringAnyMap(ts...)
+}
+
 //-------------------------------------------------------------------------------------------------
 
 func newStringAnyMap() *StringAnyMap {
@@ -89,12 +98,12 @@ func NewStringAnyMap(kv ...StringAnyTuple) *StringAnyMap {
 }
 
 // Keys returns the keys of the current map as a slice.
-func (mm *StringAnyMap) Keys() []string {
+func (mm *StringAnyMap) Keys() collection.StringList {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]string, 0, len(mm.m))
+	s := make(collection.StringList, 0, len(mm.m))
 	for k := range mm.m {
 		s = append(s, k)
 	}
@@ -103,12 +112,12 @@ func (mm *StringAnyMap) Keys() []string {
 }
 
 // Values returns the values of the current map as a slice.
-func (mm *StringAnyMap) Values() []interface{} {
+func (mm *StringAnyMap) Values() collection.AnyList {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]interface{}, 0, len(mm.m))
+	s := make(collection.AnyList, 0, len(mm.m))
 	for _, v := range mm.m {
 		s = append(s, v)
 	}
@@ -117,22 +126,38 @@ func (mm *StringAnyMap) Values() []interface{} {
 }
 
 // slice returns the internal elements of the map. This is a seam for testing etc.
-func (mm *StringAnyMap) slice() []StringAnyTuple {
+func (mm *StringAnyMap) slice() StringAnyTuples {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]StringAnyTuple, 0, len(mm.m))
+	s := make(StringAnyTuples, 0, len(mm.m))
 	for k, v := range mm.m {
-		s = append(s, StringAnyTuple{k, v})
+		s = append(s, StringAnyTuple{(k), v})
 	}
 
 	return s
 }
 
 // ToSlice returns the key/value pairs as a slice
-func (mm *StringAnyMap) ToSlice() []StringAnyTuple {
+func (mm *StringAnyMap) ToSlice() StringAnyTuples {
 	return mm.slice()
+}
+
+// OrderedSlice returns the key/value pairs as a slice in the order specified by keys.
+func (mm *StringAnyMap) OrderedSlice(keys collection.StringList) StringAnyTuples {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(StringAnyTuples, 0, len(mm.m))
+	for _, k := range keys {
+		v, found := mm.m[k]
+		if found {
+			s = append(s, StringAnyTuple{k, v})
+		}
+	}
+	return s
 }
 
 // Get returns one of the items in the map, if present.
@@ -343,7 +368,148 @@ func (mm *StringAnyMap) FlatMap(f func(string, interface{}) []StringAnyTuple) *S
 	return result
 }
 
+// Equals determines if two maps are equal to each other.
+// If they both are the same size and have the same items they are considered equal.
+// Order of items is not relevent for maps to be equal.
+func (mm *StringAnyMap) Equals(other *StringAnyMap) bool {
+	if mm == nil || other == nil {
+		return mm.IsEmpty() && other.IsEmpty()
+	}
+
+	if mm.Size() != other.Size() {
+		return false
+	}
+	for k, v1 := range mm.m {
+		v2, found := other.m[k]
+		if !found || v1 != v2 {
+			return false
+		}
+	}
+	return true
+}
+
 // Clone returns the same map, which is immutable.
 func (mm *StringAnyMap) Clone() *StringAnyMap {
 	return mm
+}
+
+//-------------------------------------------------------------------------------------------------
+
+func (mm *StringAnyMap) String() string {
+	return mm.MkString3("[", ", ", "]")
+}
+
+// implements encoding.Marshaler interface {
+//func (mm *StringAnyMap) MarshalJSON() ([]byte, error) {
+//	return mm.mkString3Bytes("{\"", "\", \"", "\"}").Bytes(), nil
+//}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (mm *StringAnyMap) MkString(sep string) string {
+	return mm.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (mm *StringAnyMap) MkString3(before, between, after string) string {
+	if mm == nil {
+		return ""
+	}
+	return mm.mkString3Bytes(before, between, after).String()
+}
+
+func (mm *StringAnyMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+
+	keys := make(collection.StringList, 0, len(mm.m))
+	for k, _ := range mm.m {
+		keys = append(keys, k)
+	}
+	keys.Sorted()
+
+	for _, k := range keys {
+		v := mm.m[k]
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", k, v))
+		sep = between
+	}
+
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this map type.
+func (mm *StringAnyMap) UnmarshalJSON(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return json.NewDecoder(buf).Decode(&mm.m)
+}
+
+// MarshalJSON implements JSON encoding for this map type.
+func (mm *StringAnyMap) MarshalJSON() ([]byte, error) {
+	return json.Marshal(mm.m)
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// GobDecode implements 'gob' decoding for this map type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (mm *StringAnyMap) GobDecode(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return gob.NewDecoder(buf).Decode(&mm.m)
+}
+
+// GobEncode implements 'gob' encoding for this list type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (mm *StringAnyMap) GobEncode() ([]byte, error) {
+	buf := &bytes.Buffer{}
+	err := gob.NewEncoder(buf).Encode(mm.m)
+	return buf.Bytes(), err
+}
+
+//-------------------------------------------------------------------------------------------------
+
+func (ts StringAnyTuples) String() string {
+	return ts.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (ts StringAnyTuples) MkString(sep string) string {
+	return ts.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts StringAnyTuples) MkString3(before, between, after string) string {
+	if ts == nil {
+		return ""
+	}
+	return ts.mkString3Bytes(before, between, after).String()
+}
+
+func (ts StringAnyTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for _, t := range ts {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this tuple type.
+func (t StringAnyTuple) UnmarshalJSON(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return json.NewDecoder(buf).Decode(&t)
+}
+
+// MarshalJSON implements encoding.Marshaler interface.
+func (t StringAnyTuple) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"key":"%v", "val":"%v"}`, t.Key, t.Val)), nil
 }

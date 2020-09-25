@@ -3,8 +3,8 @@
 //
 //
 // Generated from immutable/map.tpl with Key=string Type=uint
-// options: Comparable:true Stringer:true KeyList:<no value> ValueList:<no value> Mutable:disabled
-// by runtemplate v3.5.4
+// options: Comparable:true Stringer:true KeyList:collection.StringList ValueList:collection.UintList Mutable:disabled
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"github.com/rickb777/collection"
 )
 
 // StringUintMap is the primary type that represents a thread-safe map
@@ -67,6 +68,11 @@ func (ts StringUintTuples) Values(values ...uint) StringUintTuples {
 	return ts
 }
 
+// ToMap converts the tuples to a map.
+func (ts StringUintTuples) ToMap() *StringUintMap {
+	return NewStringUintMap(ts...)
+}
+
 //-------------------------------------------------------------------------------------------------
 
 func newStringUintMap() *StringUintMap {
@@ -92,12 +98,12 @@ func NewStringUintMap(kv ...StringUintTuple) *StringUintMap {
 }
 
 // Keys returns the keys of the current map as a slice.
-func (mm *StringUintMap) Keys() []string {
+func (mm *StringUintMap) Keys() collection.StringList {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]string, 0, len(mm.m))
+	s := make(collection.StringList, 0, len(mm.m))
 	for k := range mm.m {
 		s = append(s, k)
 	}
@@ -106,12 +112,12 @@ func (mm *StringUintMap) Keys() []string {
 }
 
 // Values returns the values of the current map as a slice.
-func (mm *StringUintMap) Values() []uint {
+func (mm *StringUintMap) Values() collection.UintList {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]uint, 0, len(mm.m))
+	s := make(collection.UintList, 0, len(mm.m))
 	for _, v := range mm.m {
 		s = append(s, v)
 	}
@@ -120,22 +126,38 @@ func (mm *StringUintMap) Values() []uint {
 }
 
 // slice returns the internal elements of the map. This is a seam for testing etc.
-func (mm *StringUintMap) slice() []StringUintTuple {
+func (mm *StringUintMap) slice() StringUintTuples {
 	if mm == nil {
 		return nil
 	}
 
-	s := make([]StringUintTuple, 0, len(mm.m))
+	s := make(StringUintTuples, 0, len(mm.m))
 	for k, v := range mm.m {
-		s = append(s, StringUintTuple{k, v})
+		s = append(s, StringUintTuple{(k), v})
 	}
 
 	return s
 }
 
 // ToSlice returns the key/value pairs as a slice
-func (mm *StringUintMap) ToSlice() []StringUintTuple {
+func (mm *StringUintMap) ToSlice() StringUintTuples {
 	return mm.slice()
+}
+
+// OrderedSlice returns the key/value pairs as a slice in the order specified by keys.
+func (mm *StringUintMap) OrderedSlice(keys collection.StringList) StringUintTuples {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(StringUintTuples, 0, len(mm.m))
+	for _, k := range keys {
+		v, found := mm.m[k]
+		if found {
+			s = append(s, StringUintTuple{k, v})
+		}
+	}
+	return s
 }
 
 // Get returns one of the items in the map, if present.
@@ -400,7 +422,14 @@ func (mm *StringUintMap) mkString3Bytes(before, between, after string) *bytes.Bu
 	b.WriteString(before)
 	sep := ""
 
-	for k, v := range mm.m {
+	keys := make(collection.StringList, 0, len(mm.m))
+	for k, _ := range mm.m {
+		keys = append(keys, k)
+	}
+	keys.Sorted()
+
+	for _, k := range keys {
+		v := mm.m[k]
 		b.WriteString(sep)
 		b.WriteString(fmt.Sprintf("%v:%v", k, v))
 		sep = between
@@ -438,4 +467,49 @@ func (mm *StringUintMap) GobEncode() ([]byte, error) {
 	buf := &bytes.Buffer{}
 	err := gob.NewEncoder(buf).Encode(mm.m)
 	return buf.Bytes(), err
+}
+
+//-------------------------------------------------------------------------------------------------
+
+func (ts StringUintTuples) String() string {
+	return ts.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (ts StringUintTuples) MkString(sep string) string {
+	return ts.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts StringUintTuples) MkString3(before, between, after string) string {
+	if ts == nil {
+		return ""
+	}
+	return ts.mkString3Bytes(before, between, after).String()
+}
+
+func (ts StringUintTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for _, t := range ts {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this tuple type.
+func (t StringUintTuple) UnmarshalJSON(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return json.NewDecoder(buf).Decode(&t)
+}
+
+// MarshalJSON implements encoding.Marshaler interface.
+func (t StringUintTuple) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"key":"%v", "val":"%v"}`, t.Key, t.Val)), nil
 }

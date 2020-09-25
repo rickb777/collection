@@ -2,14 +2,17 @@
 // Not thread-safe.
 //
 // Generated from simple/list.tpl with Type=interface{}
-// options: Comparable:<no value> Numeric:<no value> Ordered:<no value> StringLike:<no value> Stringer:<no value>
-// GobEncode:<no value> Mutable:always ToList:always ToSet:true MapTo:<no value>
-// by runtemplate v3.5.4
+// options: Comparable:true Numeric:<no value> Ordered:<no value> StringLike:<no value> Stringer:true
+// GobEncode:true Mutable:always ToList:always ToSet:true MapTo:<no value>
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
 
 import (
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"math/rand"
 	"sort"
 )
@@ -196,6 +199,24 @@ func (list AnyList) Swap(i, j int) {
 }
 
 //-------------------------------------------------------------------------------------------------
+
+// Contains determines whether a given item is already in the list, returning true if so.
+func (list AnyList) Contains(v interface{}) bool {
+	return list.Exists(func(x interface{}) bool {
+		return x == v
+	})
+}
+
+// ContainsAll determines whether the given items are all in the list, returning true if so.
+// This is potentially a slow method and should only be used rarely.
+func (list AnyList) ContainsAll(i ...interface{}) bool {
+	for _, v := range i {
+		if !list.Contains(v) {
+			return false
+		}
+	}
+	return true
+}
 
 // Exists verifies that one or more elements of AnyList return true for the predicate p.
 func (list AnyList) Exists(p func(interface{}) bool) bool {
@@ -574,6 +595,34 @@ func (list AnyList) LastIndexWhere2(p func(interface{}) bool, before int) int {
 }
 
 //-------------------------------------------------------------------------------------------------
+// These methods are included when interface{} is comparable.
+
+// Equals determines if two lists are equal to each other.
+// If they both are the same size and have the same items in the same order, they are considered equal.
+// Order of items is not relevent for sets to be equal.
+func (list AnyList) Equals(other AnyList) bool {
+	if list == nil {
+		return len(other) == 0
+	}
+
+	if other == nil {
+		return len(list) == 0
+	}
+
+	if len(list) != len(other) {
+		return false
+	}
+
+	for i, v := range list {
+		if v != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
+//-------------------------------------------------------------------------------------------------
 
 type sortableAnyList struct {
 	less func(i, j interface{}) bool
@@ -605,4 +654,66 @@ func (list AnyList) SortBy(less func(i, j interface{}) bool) AnyList {
 func (list AnyList) StableSortBy(less func(i, j interface{}) bool) AnyList {
 	sort.Stable(sortableAnyList{less, list})
 	return list
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// StringList gets a list of strings that depicts all the elements.
+func (list AnyList) StringList() []string {
+	strings := make([]string, len(list))
+	for i, v := range list {
+		strings[i] = fmt.Sprintf("%v", v)
+	}
+	return strings
+}
+
+// String implements the Stringer interface to render the list as a comma-separated string enclosed in square brackets.
+func (list AnyList) String() string {
+	return list.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
+func (list AnyList) MkString(sep string) string {
+	return list.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
+func (list AnyList) MkString3(before, between, after string) string {
+	if list == nil {
+		return ""
+	}
+
+	return list.mkString3Bytes(before, between, after).String()
+}
+
+func (list AnyList) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for _, v := range list {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v", v))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------
+
+// GobDecode implements 'gob' decoding for this list type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (list AnyList) GobDecode(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return gob.NewDecoder(buf).Decode(&list)
+}
+
+// GobEncode implements 'gob' encoding for this list type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (list AnyList) GobEncode() ([]byte, error) {
+	buf := &bytes.Buffer{}
+	err := gob.NewEncoder(buf).Encode(list)
+	return buf.Bytes(), err
 }

@@ -4,7 +4,9 @@ BASE=$PWD
 
 FIRST=$(go env GOPATH | cut -d: -f1)
 PATH=$FIRST/bin:$PATH
-RVSN=v3.5.4
+RVSN=v3.6.0
+RUNTPL=runtemplate-$RVSN
+if [[ -n $1 ]]; then RUNTPL=$1; fi
 
 function getVersionedTool
 {
@@ -19,64 +21,67 @@ function getVersionedTool
 
 getVersionedTool github.com/rickb777/runtemplate/v3 runtemplate $RVSN
 
-core="Stringer:true Comparable:true"
+core="Stringer:true Comparable:true GobEncode:true"
 int="Ordered:true Numeric:true"
-enc="GobEncode:true JsonEncode:true"
+enc=""
 
 function generateGroup
 {
+    echo $1
     cd $1
 
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=string ToSet:true  $core           MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=int    ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=uint   ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=int64  ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3  Type=uint64 ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/collection.tpl $3 'Type=interface{}/Any/nil' ToSet:true
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=string ToSet:true  $core      MapTo:int
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int    ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint   ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int64  ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint64 ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl 'Type=interface{}/Any/nil' ToSet:true $core
 
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=string ToSet:true  $core $enc      MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=int    ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=uint   ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=int64  ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3  Type=uint64 ToSet:true  $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/list.tpl       $3 'Type=interface{}/Any/nil' ToSet:true
+    $RUNTPL -f -v -tpl $2/list.tpl        Type=string ToSet:true  $core      MapTo:int
+    $RUNTPL -f -v -tpl $2/list.tpl        Type=int    ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/list.tpl        Type=uint   ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/list.tpl        Type=int64  ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/list.tpl        Type=uint64 ToSet:true  $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/list.tpl       'Type=interface{}/Any/nil' ToSet:true $core
 
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=string ToList:true $core $enc      MapTo:int
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=int    ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=uint   ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=int64  ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3  Type=uint64 ToList:true $core $enc $int MapTo:string
-    runtemplate-$RVSN -f -v -tpl $2/set.tpl        $3 'Type=interface{}/Any/nil' ToList:true
+    $RUNTPL -f -v -tpl $2/set.tpl         Type=string ToList:true $core      MapTo:int
+    $RUNTPL -f -v -tpl $2/set.tpl         Type=int    ToList:true $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/set.tpl         Type=uint   ToList:true $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/set.tpl         Type=int64  ToList:true $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/set.tpl         Type=uint64 ToList:true $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/set.tpl        'Type=interface{}/Any/nil' ToList:true $core
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=int    $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string  Type=uint   $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=string 'Type=interface{}/Any/nil'
+    $RUNTPL -f -v -tpl $2/map.tpl -o string_string_map.go Key=string  Type=string $core "KeyList=${3}StringList" "ValueList=${3}StringList" $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o string_int_map.go    Key=string  Type=int    $core "KeyList=${3}StringList" "ValueList=${3}IntList"    $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o string_uint_map.go   Key=string  Type=uint   $core "KeyList=${3}StringList" "ValueList=${3}UintList"   $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o string_any_map.go    Key=string 'Type=interface{}/Any/nil' $core "KeyList=${3}StringList" "ValueList=${3}AnyList" $4
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int     Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint    Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int64   Type=string $core $enc
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint64  Type=string $core $enc
+    $RUNTPL -f -v -tpl $2/map.tpl -o int_string_map.go    Key=int     Type=string $core "KeyList=${3}IntList"    "ValueList=${3}StringList" $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o uint_string_map.go   Key=uint    Type=string $core "KeyList=${3}UintList"   "ValueList=${3}StringList" $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o int64_string_map.go  Key=int64   Type=string $core "KeyList=${3}Int64List"  "ValueList=${3}StringList" $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o uint64_string_map.go Key=uint64  Type=string $core "KeyList=${3}Uint64List" "ValueList=${3}StringList" $4
 
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int     Type=int    $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint    Type=uint   $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=int64   Type=int64  $core $enc $int
-    runtemplate-$RVSN -f -v -tpl $2/map.tpl        $3  Key=uint64  Type=uint64 $core $enc $int
+    $RUNTPL -f -v -tpl $2/map.tpl -o int_int_map.go       Key=int     Type=int    $core $int "KeyList=${3}IntList"    "ValueList=${3}IntList"    $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o uint_uint_map.go     Key=uint    Type=uint   $core $int "KeyList=${3}UintList"   "ValueList=${3}UintList"   $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o int64_int64_map.go   Key=int64   Type=int64  $core $int "KeyList=${3}Int64List"  "ValueList=${3}Int64List"  $4
+    $RUNTPL -f -v -tpl $2/map.tpl -o uint64_uint64_map.go Key=uint64  Type=uint64 $core $int "KeyList=${3}Uint64List" "ValueList=${3}Uint64List" $4
 
     cd $BASE
+    echo
 }
 
-for d in . immutable; do
+for d in . immutable shared; do
   rm -f $d/*_collection.go $d/*_list.go $d/*_map.go $d/*_set.go
 done
 
-generateGroup .         simple
-generateGroup immutable immutable
-generateGroup .         threadsafe Prefix=Shared
+generateGroup .         simple     ''
+generateGroup immutable immutable  'collection.' 'Import:"github.com/rickb777/collection"'
+generateGroup shared    threadsafe 'collection.' 'Import:"github.com/rickb777/collection"'
 
-#runtemplate-$RVSN -tpl types/stringy.tpl         Prefix=X1 Type=Email SortableSlice:true
-#runtemplate-$RVSN -tpl plumbing/plumbing.tpl     Prefix=X1 Type=Apple
-#runtemplate-$RVSN -tpl plumbing/mapTo.tpl        Prefix=X1 Type=Apple ToPrefix=X1 ToType=Pear
+#$RUNTPL -tpl types/stringy.tpl         Prefix=X1 Type=Email SortableSlice:true
+#$RUNTPL -tpl plumbing/plumbing.tpl     Prefix=X1 Type=Apple
+#$RUNTPL -tpl plumbing/mapTo.tpl        Prefix=X1 Type=Apple ToPrefix=X1 ToType=Pear
 
-gofmt -l -w *.go immutable/*.go
+gofmt -l -w *.go */*.go
 go test ./...
+go vet  ./...

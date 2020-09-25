@@ -3,13 +3,15 @@
 // Not thread-safe.
 //
 // Generated from simple/map.tpl with Key=string Type=interface{}
-// options: Comparable:<no value> Stringer:<no value> KeyList:<no value> ValueList:<no value> Mutable:always
-// by runtemplate v3.5.4
+// options: Comparable:true Stringer:true KeyList:StringList ValueList:AnyList Mutable:always
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -62,6 +64,11 @@ func (ts StringAnyTuples) Values(values ...interface{}) StringAnyTuples {
 	return ts
 }
 
+// ToMap converts the tuples to a map.
+func (ts StringAnyTuples) ToMap() StringAnyMap {
+	return NewStringAnyMap(ts...)
+}
+
 //-------------------------------------------------------------------------------------------------
 
 func newStringAnyMap() StringAnyMap {
@@ -85,8 +92,12 @@ func NewStringAnyMap(kv ...StringAnyTuple) StringAnyMap {
 }
 
 // Keys returns the keys of the current map as a slice.
-func (mm StringAnyMap) Keys() []string {
-	s := make([]string, 0, len(mm))
+func (mm StringAnyMap) Keys() StringList {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(StringList, 0, len(mm))
 	for k := range mm {
 		s = append(s, k)
 	}
@@ -94,8 +105,12 @@ func (mm StringAnyMap) Keys() []string {
 }
 
 // Values returns the values of the current map as a slice.
-func (mm StringAnyMap) Values() []interface{} {
-	s := make([]interface{}, 0, len(mm))
+func (mm StringAnyMap) Values() AnyList {
+	if mm == nil {
+		return nil
+	}
+
+	s := make(AnyList, 0, len(mm))
 	for _, v := range mm {
 		s = append(s, v)
 	}
@@ -103,17 +118,29 @@ func (mm StringAnyMap) Values() []interface{} {
 }
 
 // slice returns the internal elements of the map. This is a seam for testing etc.
-func (mm StringAnyMap) slice() []StringAnyTuple {
-	s := make([]StringAnyTuple, 0, len(mm))
+func (mm StringAnyMap) slice() StringAnyTuples {
+	s := make(StringAnyTuples, 0, len(mm))
 	for k, v := range mm {
 		s = append(s, StringAnyTuple{(k), v})
 	}
 	return s
 }
 
-// ToSlice returns the key/value pairs as a slice
-func (mm StringAnyMap) ToSlice() []StringAnyTuple {
+// ToSlice returns the key/value pairs as a slice.
+func (mm StringAnyMap) ToSlice() StringAnyTuples {
 	return mm.slice()
+}
+
+// OrderedSlice returns the key/value pairs as a slice in the order specified by keys.
+func (mm StringAnyMap) OrderedSlice(keys StringList) StringAnyTuples {
+	s := make(StringAnyTuples, 0, len(mm))
+	for _, k := range keys {
+		v, found := mm[k]
+		if found {
+			s = append(s, StringAnyTuple{k, v})
+		}
+	}
+	return s
 }
 
 // Get returns one of the items in the map, if present.
@@ -307,6 +334,22 @@ func (mm StringAnyMap) FlatMap(f func(string, interface{}) []StringAnyTuple) Str
 	return result
 }
 
+// Equals determines if two maps are equal to each other.
+// If they both are the same size and have the same items they are considered equal.
+// Order of items is not relevent for maps to be equal.
+func (mm StringAnyMap) Equals(other StringAnyMap) bool {
+	if mm.Size() != other.Size() {
+		return false
+	}
+	for k, v1 := range mm {
+		v2, found := other[k]
+		if !found || v1 != v2 {
+			return false
+		}
+	}
+	return true
+}
+
 // Clone returns a shallow copy of the map. It does not clone the underlying elements.
 func (mm StringAnyMap) Clone() StringAnyMap {
 	result := NewStringAnyMap()
@@ -314,4 +357,93 @@ func (mm StringAnyMap) Clone() StringAnyMap {
 		result[k] = v
 	}
 	return result
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
+func (mm StringAnyMap) String() string {
+	return mm.MkString3("[", ", ", "]")
+}
+
+// implements encoding.Marshaler interface {
+//func (mm StringAnyMap) MarshalJSON() ([]byte, error) {
+//	return mm.mkString3Bytes("{\"", "\", \"", "\"}").Bytes(), nil
+//}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (mm StringAnyMap) MkString(sep string) string {
+	return mm.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (mm StringAnyMap) MkString3(before, between, after string) string {
+	return mm.mkString3Bytes(before, between, after).String()
+}
+
+func (mm StringAnyMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+
+	keys := make(StringList, 0, len(mm))
+	for k, _ := range mm {
+		keys = append(keys, k)
+	}
+	keys.Sorted()
+
+	for _, k := range keys {
+		v := mm[k]
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", k, v))
+		sep = between
+	}
+
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+func (ts StringAnyTuples) String() string {
+	return ts.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the map key/values as a string using a supplied separator. No enclosing marks are added.
+func (ts StringAnyTuples) MkString(sep string) string {
+	return ts.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the map key/values as a string, using the prefix, separator and suffix supplied.
+func (ts StringAnyTuples) MkString3(before, between, after string) string {
+	if ts == nil {
+		return ""
+	}
+	return ts.mkString3Bytes(before, between, after).String()
+}
+
+func (ts StringAnyTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for _, t := range ts {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v:%v", t.Key, t.Val))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this tuple type.
+func (t StringAnyTuple) UnmarshalJSON(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return json.NewDecoder(buf).Decode(&t)
+}
+
+// MarshalJSON implements encoding.Marshaler interface.
+func (t StringAnyTuple) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`{"key":"%v", "val":"%v"}`, t.Key, t.Val)), nil
 }

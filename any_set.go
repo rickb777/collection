@@ -3,11 +3,17 @@
 // Not thread-safe.
 //
 // Generated from simple/set.tpl with Type=interface{}
-// options: Numeric:<no value> Stringer:<no value> Mutable:always
-// by runtemplate v3.5.4
+// options: Numeric:<no value> Stringer:true Mutable:always
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
 
 // AnySet is the primary type that represents a set
 type AnySet map[interface{}]struct{}
@@ -443,4 +449,76 @@ func (set AnySet) Equals(other AnySet) bool {
 	}
 
 	return true
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// StringList gets a list of strings that depicts all the elements.
+func (set AnySet) StringList() []string {
+	strings := make([]string, len(set))
+	i := 0
+	for v := range set {
+		strings[i] = fmt.Sprintf("%v", v)
+		i++
+	}
+	return strings
+}
+
+// String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
+func (set AnySet) String() string {
+	return set.mkString3Bytes("[", ", ", "]").String()
+}
+
+// MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
+func (set AnySet) MkString(sep string) string {
+	return set.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
+func (set AnySet) MkString3(before, between, after string) string {
+	return set.mkString3Bytes(before, between, after).String()
+}
+
+func (set AnySet) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+	for v := range set {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v", v))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this set type.
+func (set AnySet) UnmarshalJSON(b []byte) error {
+	values := make([]interface{}, 0)
+	buf := bytes.NewBuffer(b)
+	err := json.NewDecoder(buf).Decode(&values)
+	if err != nil {
+		return err
+	}
+	set.Add(values...)
+	return nil
+}
+
+// MarshalJSON implements JSON encoding for this set type.
+func (set AnySet) MarshalJSON() ([]byte, error) {
+	buf := &bytes.Buffer{}
+	err := json.NewEncoder(buf).Encode(set.ToSlice())
+	return buf.Bytes(), err
+}
+
+// StringMap renders the set as a map of strings. The value of each item in the set becomes stringified as a key in the
+// resulting map.
+func (set AnySet) StringMap() map[string]bool {
+	strings := make(map[string]bool)
+	for v := range set {
+		strings[fmt.Sprintf("%v", v)] = true
+	}
+	return strings
 }

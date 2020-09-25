@@ -3,11 +3,18 @@
 //
 //
 // Generated from immutable/set.tpl with Type=interface{}
-// options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:<no value> Mutable:disabled
-// by runtemplate v3.5.4
+// options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true Mutable:disabled
+// by runtemplate v3.6.0
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
+
+import (
+	"bytes"
+	"encoding/gob"
+	"encoding/json"
+	"fmt"
+)
 
 // AnySet is the primary type that represents a set.
 type AnySet struct {
@@ -538,4 +545,104 @@ func (set *AnySet) Equals(other *AnySet) bool {
 	}
 
 	return true
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// StringList gets a list of strings that depicts all the elements.
+func (set *AnySet) StringList() []string {
+
+	strings := make([]string, len(set.m))
+	i := 0
+	for v := range set.m {
+		strings[i] = fmt.Sprintf("%v", v)
+		i++
+	}
+	return strings
+}
+
+// String implements the Stringer interface to render the set as a comma-separated string enclosed in square brackets.
+func (set *AnySet) String() string {
+	return set.MkString3("[", ", ", "]")
+}
+
+// MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
+func (set *AnySet) MkString(sep string) string {
+	return set.MkString3("", sep, "")
+}
+
+// MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
+func (set *AnySet) MkString3(before, between, after string) string {
+	if set == nil {
+		return ""
+	}
+	return set.mkString3Bytes(before, between, after).String()
+}
+
+func (set *AnySet) mkString3Bytes(before, between, after string) *bytes.Buffer {
+	b := &bytes.Buffer{}
+	b.WriteString(before)
+	sep := ""
+
+	for v := range set.m {
+		b.WriteString(sep)
+		b.WriteString(fmt.Sprintf("%v", v))
+		sep = between
+	}
+	b.WriteString(after)
+	return b
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// UnmarshalJSON implements JSON decoding for this set type.
+func (set *AnySet) UnmarshalJSON(b []byte) error {
+
+	values := make([]interface{}, 0)
+	err := json.Unmarshal(b, &values)
+	if err != nil {
+		return err
+	}
+
+	s2 := NewAnySet(values...)
+	*set = *s2
+	return nil
+}
+
+// MarshalJSON implements JSON encoding for this set type.
+func (set *AnySet) MarshalJSON() ([]byte, error) {
+
+	buf, err := json.Marshal(set.ToSlice())
+	return buf, err
+}
+
+// StringMap renders the set as a map of strings. The value of each item in the set becomes stringified as a key in the
+// resulting map.
+func (set *AnySet) StringMap() map[string]bool {
+	if set == nil {
+		return nil
+	}
+
+	strings := make(map[string]bool)
+	for v := range set.m {
+		strings[fmt.Sprintf("%v", v)] = true
+	}
+	return strings
+}
+
+//-------------------------------------------------------------------------------------------------
+
+// GobDecode implements 'gob' decoding for this set type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (set *AnySet) GobDecode(b []byte) error {
+	buf := bytes.NewBuffer(b)
+	return gob.NewDecoder(buf).Decode(&set.m)
+}
+
+// GobEncode implements 'gob' encoding for this list type.
+// You must register interface{} with the 'gob' package before this method is used.
+func (set AnySet) GobEncode() ([]byte, error) {
+	buf := &bytes.Buffer{}
+	err := gob.NewEncoder(buf).Encode(set.m)
+	return buf.Bytes(), err
 }
