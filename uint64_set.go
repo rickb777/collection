@@ -4,7 +4,7 @@
 //
 // Generated from simple/set.tpl with Type=uint64
 // options: Numeric:true Stringer:true Mutable:always
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // Uint64Set is the primary type that represents a set
@@ -616,8 +617,8 @@ func (set Uint64Set) MkString3(before, between, after string) string {
 	return set.mkString3Bytes(before, between, after).String()
 }
 
-func (set Uint64Set) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (set Uint64Set) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for v := range set {

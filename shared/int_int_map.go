@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/map.tpl with Key=int Type=int
 // options: Comparable:true Stringer:true KeyList:collection.IntList ValueList:collection.IntList Mutable:always
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rickb777/collection"
+	"strings"
 	"sync"
 )
 
@@ -535,8 +536,8 @@ func (mm *IntIntMap) MkString3(before, between, after string) string {
 	return mm.mkString3Bytes(before, between, after).String()
 }
 
-func (mm *IntIntMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (mm *IntIntMap) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	mm.s.RLock()
@@ -601,8 +602,8 @@ func (ts IntIntTuples) MkString3(before, between, after string) string {
 	return ts.mkString3Bytes(before, between, after).String()
 }
 
-func (ts IntIntTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (ts IntIntTuples) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for _, t := range ts {

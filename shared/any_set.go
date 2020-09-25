@@ -4,7 +4,7 @@
 //
 // Generated from threadsafe/set.tpl with Type=interface{}
 // options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true ToList:true
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -673,8 +674,8 @@ func (set *AnySet) MkString3(before, between, after string) string {
 	return set.mkString3Bytes(before, between, after).String()
 }
 
-func (set *AnySet) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (set *AnySet) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 

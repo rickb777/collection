@@ -4,7 +4,7 @@
 //
 // Generated from immutable/set.tpl with Type=string
 // options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true Mutable:disabled
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // StringSet is the primary type that represents a set.
@@ -617,8 +618,8 @@ func (set *StringSet) MkString3(before, between, after string) string {
 	return set.mkString3Bytes(before, between, after).String()
 }
 
-func (set *StringSet) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (set *StringSet) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 

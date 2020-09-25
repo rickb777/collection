@@ -4,7 +4,7 @@
 // Generated from threadsafe/list.tpl with Type=int
 // options: Comparable:true Numeric:true Ordered:true StringLike:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -1282,11 +1283,11 @@ func (list *IntList) StringList() []string {
 	list.s.RLock()
 	defer list.s.RUnlock()
 
-	strings := make([]string, len(list.m))
+	ss := make([]string, len(list.m))
 	for i, v := range list.m {
-		strings[i] = fmt.Sprintf("%v", v)
+		ss[i] = fmt.Sprintf("%v", v)
 	}
-	return strings
+	return ss
 }
 
 // String implements the Stringer interface to render the list as a comma-separated string enclosed in square brackets.
@@ -1308,8 +1309,8 @@ func (list *IntList) MkString3(before, between, after string) string {
 	return list.mkString3Bytes(before, between, after).String()
 }
 
-func (list IntList) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (list IntList) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 

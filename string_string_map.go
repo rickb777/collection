@@ -4,7 +4,7 @@
 //
 // Generated from simple/map.tpl with Key=string Type=string
 // options: Comparable:true Stringer:true KeyList:StringList ValueList:StringList Mutable:always
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // StringStringMap is the primary type that represents a map
@@ -381,8 +382,8 @@ func (mm StringStringMap) MkString3(before, between, after string) string {
 	return mm.mkString3Bytes(before, between, after).String()
 }
 
-func (mm StringStringMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (mm StringStringMap) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 
@@ -422,8 +423,8 @@ func (ts StringStringTuples) MkString3(before, between, after string) string {
 	return ts.mkString3Bytes(before, between, after).String()
 }
 
-func (ts StringStringTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (ts StringStringTuples) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for _, t := range ts {

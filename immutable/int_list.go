@@ -4,7 +4,7 @@
 //
 // Generated from immutable/list.tpl with Type=int
 // options: Comparable:true Numeric:true Ordered:true Stringer:true GobEncode:true Mutable:disabled
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strings"
 )
 
 // IntList contains a slice of type int. It is designed
@@ -930,8 +931,8 @@ func (list *IntList) MkString3(before, between, after string) string {
 	return list.mkString3Bytes(before, between, after).String()
 }
 
-func (list IntList) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (list IntList) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 

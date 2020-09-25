@@ -4,7 +4,7 @@
 //
 // Generated from immutable/map.tpl with Key=int64 Type=int64
 // options: Comparable:true Stringer:true KeyList:collection.Int64List ValueList:collection.Int64List Mutable:disabled
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rickb777/collection"
+	"strings"
 )
 
 // Int64Int64Map is the primary type that represents a thread-safe map
@@ -417,8 +418,8 @@ func (mm *Int64Int64Map) MkString3(before, between, after string) string {
 	return mm.mkString3Bytes(before, between, after).String()
 }
 
-func (mm *Int64Int64Map) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (mm *Int64Int64Map) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 
@@ -475,8 +476,8 @@ func (ts Int64Int64Tuples) MkString3(before, between, after string) string {
 	return ts.mkString3Bytes(before, between, after).String()
 }
 
-func (ts Int64Int64Tuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (ts Int64Int64Tuples) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for _, t := range ts {

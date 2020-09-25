@@ -4,7 +4,7 @@
 //
 // Generated from immutable/map.tpl with Key=string Type=int
 // options: Comparable:true Stringer:true KeyList:collection.StringList ValueList:collection.IntList Mutable:disabled
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package immutable
@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/rickb777/collection"
+	"strings"
 )
 
 // StringIntMap is the primary type that represents a thread-safe map
@@ -417,8 +418,8 @@ func (mm *StringIntMap) MkString3(before, between, after string) string {
 	return mm.mkString3Bytes(before, between, after).String()
 }
 
-func (mm *StringIntMap) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (mm *StringIntMap) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 
@@ -488,8 +489,8 @@ func (ts StringIntTuples) MkString3(before, between, after string) string {
 	return ts.mkString3Bytes(before, between, after).String()
 }
 
-func (ts StringIntTuples) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (ts StringIntTuples) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for _, t := range ts {

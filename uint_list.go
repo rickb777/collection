@@ -4,7 +4,7 @@
 // Generated from simple/list.tpl with Type=uint
 // options: Comparable:true Numeric:true Ordered:true StringLike:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strings"
 )
 
 // UintList is a slice of type uint. Use it where you would use []uint.
@@ -841,8 +842,8 @@ func (list UintList) MkString3(before, between, after string) string {
 	return list.mkString3Bytes(before, between, after).String()
 }
 
-func (list UintList) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (list UintList) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 	for _, v := range list {

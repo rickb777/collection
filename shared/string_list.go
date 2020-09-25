@@ -4,7 +4,7 @@
 // Generated from threadsafe/list.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Ordered:<no value> StringLike:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:int
-// by runtemplate v3.6.0
+// by runtemplate v3.6.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package shared
@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -1151,8 +1152,8 @@ func (list *StringList) MkString3(before, between, after string) string {
 	return list.mkString3Bytes(before, between, after).String()
 }
 
-func (list StringList) mkString3Bytes(before, between, after string) *bytes.Buffer {
-	b := &bytes.Buffer{}
+func (list StringList) mkString3Bytes(before, between, after string) *strings.Builder {
+	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
 
