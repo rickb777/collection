@@ -1,7 +1,7 @@
 # collection
 
-[![GoDoc](https://img.shields.io/badge/api-Godoc-blue.svg?style=flat-square)](https://godoc.org/github.com/rickb777/collection)
-[![Build Status](https://travis-ci.org/rickb777/collection.svg?branch=master)](https://travis-ci.org/rickb777/collection)
+[![GoDoc](https://img.shields.io/badge/api-Godoc-blue.svg)](https://pkg.go.dev/github.com/rickb777/collection)
+[![Build Status](https://travis-ci.org/rickb777/collection.svg?branch=master)](https://travis-ci.org/rickb777/collection/builds)
 [![Issues](https://img.shields.io/github/issues/rickb777/collection.svg)](https://github.com/rickb777/collection/issues)
 
 A suite of general-purpose collections for Go.
