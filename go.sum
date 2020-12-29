@@ -83,12 +83,10 @@ github.com/onsi/gomega v1.7.1/go.mod h1:XdKZgCCFLUoM/7CFJVPcG8C1xQ1AJ0vpAezJrB7J
 github.com/onsi/gomega v1.10.2/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1ybHNo=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rickb777/runtemplate/v3 v3.6.0 h1:Ac/YrvhBCQSNU5Kxgx/N+u1J/9MHOJhOn0eYVDTr8IU=
-github.com/rickb777/runtemplate/v3 v3.6.0/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
-github.com/rickb777/runtemplate/v3 v3.6.1 h1:OH1XIxBEN50UI5wYcMbo7uzhfiC8HrjfZMqXgxJNlug=
-github.com/rickb777/runtemplate/v3 v3.6.1/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
 github.com/rickb777/runtemplate/v3 v3.7.0 h1:EsoTsvjTJiIBGCvuz7o00XcJNcOACxI6gOtRkj31wYY=
 github.com/rickb777/runtemplate/v3 v3.7.0/go.mod h1:TB/BgSO8HkctR5nD9IGiqZXssZCHexmMzQJHKTNAfDY=
+github.com/rickb777/runtemplate/v3 v3.7.1 h1:qpl7dW4TXnr+t8KUBf4QhlgInZhijvQeGFsw9H/Eq48=
+github.com/rickb777/runtemplate/v3 v3.7.1/go.mod h1:7rkuNyq7GD5yYejgK2PPhyIrfiXYV/YFKrJIz/H0+II=
 github.com/rogpeppe/go-internal v1.1.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.3.2/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=

@@ -4,7 +4,7 @@
 //
 // Generated from simple/map.tpl with Key=int64 Type=string
 // options: Comparable:true Stringer:true KeyList:Int64List ValueList:StringList Mutable:always
-// by runtemplate v3.7.0
+// by runtemplate v3.7.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
 package collection
