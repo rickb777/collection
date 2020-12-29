@@ -32,7 +32,7 @@ type UintMkStringer interface {
 	// implements json.Marshaler interface {
 	MarshalJSON() ([]byte, error)
 
-	// StringList gets a list of strings that depicts all the elements.
+	// StringList gets a slice of strings that depicts all the elements.
 	StringList() []string
 }
 
@@ -46,9 +46,6 @@ type UintCollection interface {
 
 	// IsSet returns false for lists and queues.
 	IsSet() bool
-
-	// ToSet returns a shallow copy as a set.
-	ToSet() *UintSet
 
 	// ToSlice returns a shallow copy as a plain slice.
 	ToSlice() []uint
@@ -74,7 +71,7 @@ type UintCollection interface {
 	MapToString(f func(uint) string) []string
 
 	// FlatMapString returns a new []string by transforming every element with function f
-	// that returns zero or more items in a slice. The resulting list may have a different size to the
+	// that returns zero or more items in a slice. The resulting slice may have a different size to the
 	// collection. The collection is not modified.
 	FlatMapToString(f func(uint) []string) []string
 
@@ -107,6 +104,26 @@ type UintCollection interface {
 	// element is returned. Panics if there are no elements.
 	MaxBy(less func(uint, uint) bool) uint
 
+	// Fold aggregates all the values in the collection using a supplied function, starting from some initial value.
+	Fold(initial uint, fn func(uint, uint) uint) uint
+
 	// Sum returns the sum of all the elements in the collection.
 	Sum() uint
+}
+
+// UintSequence defines an interface for sequence methods on uint.
+type UintSequence interface {
+	UintCollection
+
+	// Head gets the first element in the sequence. Head plus Tail include the whole sequence. Head is the opposite of Last.
+	Head() uint
+
+	// HeadOption gets the first element in the sequence, if possible.
+	HeadOption() (uint, bool)
+
+	// Last gets the last element in the sequence. Init plus Last include the whole sequence. Last is the opposite of Head.
+	Last() uint
+
+	// LastOption gets the last element in the sequence, if possible.
+	LastOption() (uint, bool)
 }

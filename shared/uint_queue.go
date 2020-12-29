@@ -10,7 +10,7 @@
 //
 // Generated from threadsafe/queue.tpl with Type=uint
 // options: Comparable:true Numeric:true Ordered:true Sorted:<no value> Stringer:true
-// ToList:<no value> ToSet:true
+// ToList:true ToSet:true
 // by runtemplate v3.7.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
@@ -152,6 +152,21 @@ func (queue *UintQueue) IsSet() bool {
 	return false
 }
 
+// ToList returns the elements of the queue as a list. The returned list is a shallow
+// copy; the queue is not altered.
+func (queue *UintQueue) ToList() *UintList {
+	if queue == nil {
+		return nil
+	}
+
+	queue.s.RLock()
+	defer queue.s.RUnlock()
+
+	list := MakeUintList(queue.length, queue.length)
+	queue.toSlice(list.m)
+	return list
+}
+
 // ToSet returns the elements of the queue as a set. The returned set is a shallow
 // copy; the queue is not altered.
 func (queue *UintQueue) ToSet() *UintSet {
@@ -263,19 +278,19 @@ func (queue *UintQueue) Head() uint {
 
 // HeadOption returns the oldest item in the queue without removing it. If the queue
 // is nil or empty, it returns the zero value instead.
-func (queue *UintQueue) HeadOption() uint {
+func (queue *UintQueue) HeadOption() (uint, bool) {
 	if queue == nil {
-		return 0
+		return 0, false
 	}
 
 	queue.s.RLock()
 	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
-		return 0
+		return 0, false
 	}
 
-	return queue.m[queue.read]
+	return queue.m[queue.read], true
 }
 
 // Last gets the the newest item in the queue (i.e. last element pushed) without removing it.
@@ -295,16 +310,16 @@ func (queue *UintQueue) Last() uint {
 
 // LastOption returns the newest item in the queue without removing it. If the queue
 // is nil empty, it returns the zero value instead.
-func (queue *UintQueue) LastOption() uint {
+func (queue *UintQueue) LastOption() (uint, bool) {
 	if queue == nil {
-		return 0
+		return 0, false
 	}
 
 	queue.s.RLock()
 	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
-		return 0
+		return 0, false
 	}
 
 	i := queue.write - 1
@@ -312,7 +327,7 @@ func (queue *UintQueue) LastOption() uint {
 		i = queue.capacity - 1
 	}
 
-	return queue.m[i]
+	return queue.m[i], true
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1006,6 +1021,26 @@ func (queue *UintQueue) CountBy(p func(uint) bool) (result int) {
 		}
 	}
 	return
+}
+
+// Fold aggregates all the values in the queue using a supplied function, starting from some initial value.
+func (queue *UintQueue) Fold(initial uint, fn func(uint, uint) uint) uint {
+	if queue == nil {
+		return initial
+	}
+
+	queue.s.RLock()
+	defer queue.s.RUnlock()
+
+	m := initial
+	front, back := queue.frontAndBack()
+	for _, v := range front {
+		m = fn(m, v)
+	}
+	for _, v := range back {
+		m = fn(m, v)
+	}
+	return m
 }
 
 // MinBy returns an element of UintQueue containing the minimum value, when compared to other elements

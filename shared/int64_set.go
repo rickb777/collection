@@ -711,6 +711,19 @@ func (set *Int64Set) Max() (result int64) {
 	return m
 }
 
+// Fold aggregates all the values in the set using a supplied function, starting from some initial value.
+func (set *Int64Set) Fold(initial int64, fn func(int64, int64) int64) int64 {
+	set.s.RLock()
+	defer set.s.RUnlock()
+
+	m := initial
+	for v := range set.m {
+		m = fn(m, v)
+	}
+
+	return m
+}
+
 // MinBy returns an element of Int64Set containing the minimum value, when compared to other elements
 // using a passed func defining ‘less’. In the case of multiple items being equally minimal, the first such
 // element is returned. Panics if there are no elements.

@@ -136,11 +136,11 @@ func (list AnyList) Head() interface{} {
 
 // HeadOption gets the first element in the list, if possible.
 // Otherwise returns the zero value.
-func (list AnyList) HeadOption() interface{} {
+func (list AnyList) HeadOption() (interface{}, bool) {
 	if list.IsEmpty() {
-		return nil
+		return nil, false
 	}
-	return list[0]
+	return list[0], true
 }
 
 // Last gets the last element in the list. Init plus Last include the whole list. Last is the opposite of Head.
@@ -151,11 +151,11 @@ func (list AnyList) Last() interface{} {
 
 // LastOption gets the last element in the list, if possible.
 // Otherwise returns the zero value.
-func (list AnyList) LastOption() interface{} {
+func (list AnyList) LastOption() (interface{}, bool) {
 	if list.IsEmpty() {
-		return nil
+		return nil, false
 	}
-	return list[len(list)-1]
+	return list[len(list)-1], true
 }
 
 // Tail gets everything except the head. Head plus Tail include the whole list. Tail is the opposite of Init.
@@ -503,6 +503,16 @@ func (list AnyList) CountBy(p func(interface{}) bool) (result int) {
 		}
 	}
 	return
+}
+
+// Fold aggregates all the values in the list using a supplied function, starting from some initial value.
+func (list AnyList) Fold(initial interface{}, fn func(interface{}, interface{}) interface{}) interface{} {
+	m := initial
+	for _, v := range list {
+		m = fn(m, v)
+	}
+
+	return m
 }
 
 // MinBy returns an element of AnyList containing the minimum value, when compared to other elements

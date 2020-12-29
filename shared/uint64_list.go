@@ -245,18 +245,18 @@ func (list *Uint64List) Head() uint64 {
 
 // HeadOption gets the first element in the list, if possible.
 // Otherwise returns the zero value.
-func (list *Uint64List) HeadOption() uint64 {
+func (list *Uint64List) HeadOption() (uint64, bool) {
 	if list == nil {
-		return 0
+		return 0, false
 	}
 
 	list.s.RLock()
 	defer list.s.RUnlock()
 
 	if len(list.m) == 0 {
-		return 0
+		return 0, false
 	}
-	return list.m[0]
+	return list.m[0], true
 }
 
 // Last gets the last element in the list. Init plus Last include the whole list. Last is the opposite of Head.
@@ -270,18 +270,18 @@ func (list *Uint64List) Last() uint64 {
 
 // LastOption gets the last element in the list, if possible.
 // Otherwise returns the zero value.
-func (list *Uint64List) LastOption() uint64 {
+func (list *Uint64List) LastOption() (uint64, bool) {
 	if list == nil {
-		return 0
+		return 0, false
 	}
 
 	list.s.RLock()
 	defer list.s.RUnlock()
 
 	if len(list.m) == 0 {
-		return 0
+		return 0, false
 	}
-	return list.m[len(list.m)-1]
+	return list.m[len(list.m)-1], true
 }
 
 // Tail gets everything except the head. Head plus Tail include the whole list. Tail is the opposite of Init.
@@ -994,6 +994,19 @@ func (list *Uint64List) CountBy(p func(uint64) bool) (result int) {
 		}
 	}
 	return
+}
+
+// Fold aggregates all the values in the list using a supplied function, starting from some initial value.
+func (list *Uint64List) Fold(initial uint64, fn func(uint64, uint64) uint64) uint64 {
+	list.s.RLock()
+	defer list.s.RUnlock()
+
+	m := initial
+	for _, v := range list.m {
+		m = fn(m, v)
+	}
+
+	return m
 }
 
 // MinBy returns an element of Uint64List containing the minimum value, when compared to other elements

@@ -13,13 +13,13 @@ type Uint64Sizer interface {
 	// NonEmpty tests whether Uint64Collection is empty.
 	NonEmpty() bool
 
-	// Size returns the number of items in the list - an alias of Len().
+	// Size returns the number of items in the collection - an alias of Len().
 	Size() int
 }
 
 // Uint64MkStringer defines an interface for stringer methods on uint64 collections.
 type Uint64MkStringer interface {
-	// String implements the Stringer interface to render the list as a comma-separated string enclosed
+	// String implements the Stringer interface to render the collection as a comma-separated string enclosed
 	// in square brackets.
 	String() string
 
@@ -35,7 +35,7 @@ type Uint64MkStringer interface {
 	// implements json.Unmarshaler interface {
 	//UnmarshalJSON(b []byte) error
 
-	// StringList gets a list of strings that depicts all the elements.
+	// StringList gets a collection of strings that depicts all the elements.
 	StringList() []string
 }
 
@@ -49,9 +49,6 @@ type Uint64Collection interface {
 
 	// IsSet returns false for lists and queues.
 	IsSet() bool
-
-	// ToSet returns a shallow copy as a set.
-	ToSet() Uint64Set
 
 	// ToSlice returns a shallow copy as a plain slice.
 	ToSlice() []uint64
@@ -104,6 +101,26 @@ type Uint64Collection interface {
 	// element is returned. Panics if there are no elements.
 	MaxBy(less func(uint64, uint64) bool) uint64
 
+	// Fold aggregates all the values in the collection using a supplied function, starting from some initial value.
+	Fold(initial uint64, fn func(uint64, uint64) uint64) uint64
+
 	// Sum returns the sum of all the elements in the collection.
 	Sum() uint64
+}
+
+// Uint64Sequence defines an interface for sequence methods on uint64.
+type Uint64Sequence interface {
+	Uint64Collection
+
+	// Head gets the first element in the sequence. Head plus Tail include the whole sequence. Head is the opposite of Last.
+	Head() uint64
+
+	// HeadOption gets the first element in the sequence, if possible.
+	HeadOption() (uint64, bool)
+
+	// Last gets the last element in the sequence. Init plus Last include the whole sequence. Last is the opposite of Head.
+	Last() uint64
+
+	// LastOption gets the last element in the sequence, if possible.
+	LastOption() (uint64, bool)
 }

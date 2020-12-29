@@ -4,7 +4,7 @@ BASE=$PWD
 
 FIRST=$(go env GOPATH | cut -d: -f1)
 PATH=$FIRST/bin:$PATH
-RVSN=v3.7.1
+RVSN=v3.9.0
 RUNTPL=runtemplate-$RVSN
 if [[ -n $1 ]]; then RUNTPL=$1; fi
 
@@ -30,12 +30,12 @@ function generateGroup
     echo $1
     cd $1
 
-    $RUNTPL -f -v -tpl $2/collection.tpl  Type=string ToSet:true  $core      MapTo:int
-    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int    ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint   ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int64  ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint64 ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/collection.tpl 'Type=interface{}/Any/nil' ToSet:true $core
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=string ToSet:false $core      MapTo:int
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int    ToSet:false $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint   ToSet:false $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=int64  ToSet:false $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl  Type=uint64 ToSet:false $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/collection.tpl 'Type=interface{}/Any/nil' ToSet:false $core
 
     $RUNTPL -f -v -tpl $2/list.tpl        Type=string ToSet:true  $core      MapTo:int
     $RUNTPL -f -v -tpl $2/list.tpl        Type=int    ToSet:true  $core $int MapTo:string
@@ -70,17 +70,17 @@ function generateGroup
     echo
 }
 
-function generateShared
+function generateQueues
 {
-    echo $1
     cd $1
+    echo $1
 
-    $RUNTPL -f -v -tpl $2/queue.tpl       Type=string ToSet:true  $core      MapTo:int
-    $RUNTPL -f -v -tpl $2/queue.tpl       Type=int    ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/queue.tpl       Type=uint   ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/queue.tpl       Type=int64  ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/queue.tpl       Type=uint64 ToSet:true  $core $int MapTo:string
-    $RUNTPL -f -v -tpl $2/queue.tpl      'Type=interface{}/Any/nil' ToSet:true $core
+    $RUNTPL -f -v -tpl $2/queue.tpl  Type=string               ToList:$3 ToSet:$3 $core      MapTo:int
+    $RUNTPL -f -v -tpl $2/queue.tpl  Type=int                  ToList:$3 ToSet:$3 $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/queue.tpl  Type=uint                 ToList:$3 ToSet:$3 $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/queue.tpl  Type=int64                ToList:$3 ToSet:$3 $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/queue.tpl  Type=uint64               ToList:$3 ToSet:$3 $core $int MapTo:string
+    $RUNTPL -f -v -tpl $2/queue.tpl 'Type=interface{}/Any/nil' ToList:$3 ToSet:$3 $core
 
     cd $BASE
     echo
@@ -93,7 +93,9 @@ done
 generateGroup  .         simple     ''
 generateGroup  immutable immutable  'collection.' 'Import:"github.com/rickb777/collection"'
 generateGroup  shared    threadsafe 'collection.' 'Import:"github.com/rickb777/collection"'
-generateShared shared    threadsafe 'collection.' 'Import:"github.com/rickb777/collection"'
+
+generateQueues .         fast       false
+generateQueues shared    threadsafe true
 
 #$RUNTPL -tpl types/stringy.tpl         Prefix=X1 Type=Email SortableSlice:true
 #$RUNTPL -tpl plumbing/plumbing.tpl     Prefix=X1 Type=Apple

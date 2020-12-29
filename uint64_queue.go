@@ -1,4 +1,4 @@
-// A queue or fifo that holds string, implemented via a ring buffer. Unlike the list collections, these
+// A queue or fifo that holds uint64, implemented via a ring buffer. Unlike the list collections, these
 // have a fixed size (although this can be changed when needed). For mutable collection that need frequent
 // appending, the fixed size is a benefit because the memory footprint is constrained. However, this is
 // not usable unless the rate of removing items from the queue is, over time, the same as the rate of addition.
@@ -6,65 +6,62 @@
 //
 // The queue provides a method to sort its elements.
 //
-// Thread-safe.
+// Not thread-safe.
 //
-// Generated from threadsafe/queue.tpl with Type=string
-// options: Comparable:true Numeric:<no value> Ordered:<no value> Sorted:<no value> Stringer:true
-// ToList:true ToSet:true
+// Generated from fast/queue.tpl with Type=uint64
+// options: Comparable:true Numeric:true Ordered:true Sorted:<no value> Stringer:true
+// ToList:false ToSet:false
 // by runtemplate v3.7.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
-package shared
+package collection
 
 import (
 	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
-	"sync"
 )
 
-// StringQueue is a ring buffer containing a slice of type string. It is optimised
+// Uint64Queue is a ring buffer containing a slice of type uint64. It is optimised
 // for FIFO operations.
-type StringQueue struct {
-	m         []string
+type Uint64Queue struct {
+	m         []uint64
 	read      int
 	write     int
 	length    int
 	capacity  int
 	overwrite bool
-	less      func(i, j string) bool
-	s         *sync.RWMutex
+	less      func(i, j uint64) bool
 }
 
-// NewStringQueue returns a new queue of string. The behaviour when adding
+// NewUint64Queue returns a new queue of uint64. The behaviour when adding
 // to the queue depends on overwrite. If true, the push operation overwrites oldest values up to
 // the space available, when the queue is full. Otherwise, it refuses to overfill the queue.
-func NewStringQueue(capacity int, overwrite bool) *StringQueue {
-	return NewStringSortedQueue(capacity, overwrite, nil)
+func NewUint64Queue(capacity int, overwrite bool) *Uint64Queue {
+	return NewUint64SortedQueue(capacity, overwrite, nil)
 }
 
-// NewStringSortedQueue returns a new queue of string. The behaviour when adding
+// NewUint64SortedQueue returns a new queue of uint64. The behaviour when adding
 // to the queue depends on overwrite. If true, the push operation overwrites oldest values up to
 // the space available, when the queue is full. Otherwise, it refuses to overfill the queue.
 // If the 'less' comparison function is not nil, elements can be easily sorted.
-func NewStringSortedQueue(capacity int, overwrite bool, less func(i, j string) bool) *StringQueue {
-	return &StringQueue{
-		m:         make([]string, capacity),
+func NewUint64SortedQueue(capacity int, overwrite bool, less func(i, j uint64) bool) *Uint64Queue {
+	return &Uint64Queue{
+		m:         make([]uint64, capacity),
 		read:      0,
 		write:     0,
 		length:    0,
 		capacity:  capacity,
 		overwrite: overwrite,
 		less:      less,
-		s:         &sync.RWMutex{},
 	}
 }
 
-// BuildStringQueueFromChan constructs a new StringQueue from a channel that supplies
+// BuildUint64QueueFromChan constructs a new Uint64Queue from a channel that supplies
 // a sequence of values until it is closed. The function doesn't return until then.
-func BuildStringQueueFromChan(source <-chan string) *StringQueue {
-	queue := NewStringQueue(0, false)
+func BuildUint64QueueFromChan(source <-chan uint64) *Uint64Queue {
+	queue := NewUint64Queue(0, false)
 	for v := range source {
 		queue.m = append(queue.m, v)
 	}
@@ -87,17 +84,15 @@ func BuildStringQueueFromChan(source <-chan string) *StringQueue {
 // Reallocate adjusts the storage space but does not clone the underlying elements.
 //
 // The queue must not be nil.
-func (queue *StringQueue) Reallocate(capacity int, overwrite bool) *StringQueue {
+func (queue *Uint64Queue) Reallocate(capacity int, overwrite bool) *Uint64Queue {
 	if capacity < 1 {
 		panic("capacity must be at least 1")
 	}
 
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	return queue.doReallocate(capacity, overwrite)
 }
 
-func (queue *StringQueue) doReallocate(capacity int, overwrite bool) *StringQueue {
+func (queue *Uint64Queue) doReallocate(capacity int, overwrite bool) *Uint64Queue {
 	queue.overwrite = overwrite
 
 	if capacity < queue.length {
@@ -109,7 +104,7 @@ func (queue *StringQueue) doReallocate(capacity int, overwrite bool) *StringQueu
 
 	if capacity != queue.capacity {
 		oldLength := queue.length
-		queue.m = queue.toSlice(make([]string, capacity))
+		queue.m = queue.toSlice(make([]uint64, capacity))
 		if oldLength > len(queue.m) {
 			oldLength = len(queue.m)
 		}
@@ -123,17 +118,15 @@ func (queue *StringQueue) doReallocate(capacity int, overwrite bool) *StringQueu
 }
 
 // Space returns the space available in the queue.
-func (queue *StringQueue) Space() int {
+func (queue *Uint64Queue) Space() int {
 	if queue == nil {
 		return 0
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.capacity - queue.length
 }
 
 // Cap gets the capacity of this queue.
-func (queue *StringQueue) Cap() int {
+func (queue *Uint64Queue) Cap() int {
 	if queue == nil {
 		return 0
 	}
@@ -143,57 +136,25 @@ func (queue *StringQueue) Cap() int {
 //-------------------------------------------------------------------------------------------------
 
 // IsSequence returns true for ordered lists and queues.
-func (queue *StringQueue) IsSequence() bool {
+func (queue *Uint64Queue) IsSequence() bool {
 	return true
 }
 
 // IsSet returns false for lists or queues.
-func (queue *StringQueue) IsSet() bool {
+func (queue *Uint64Queue) IsSet() bool {
 	return false
 }
 
-// ToList returns the elements of the queue as a list. The returned list is a shallow
-// copy; the queue is not altered.
-func (queue *StringQueue) ToList() *StringList {
-	if queue == nil {
-		return nil
-	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	list := MakeStringList(queue.length, queue.length)
-	queue.toSlice(list.m)
-	return list
-}
-
-// ToSet returns the elements of the queue as a set. The returned set is a shallow
-// copy; the queue is not altered.
-func (queue *StringQueue) ToSet() *StringSet {
-	if queue == nil {
-		return nil
-	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	slice := queue.toSlice(make([]string, queue.length))
-	return NewStringSet(slice...)
-}
-
 // ToSlice returns the elements of the queue as a slice. The queue is not altered.
-func (queue *StringQueue) ToSlice() []string {
+func (queue *Uint64Queue) ToSlice() []uint64 {
 	if queue == nil {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	return queue.toSlice(make([]string, queue.length))
+	return queue.toSlice(make([]uint64, queue.length))
 }
 
-func (queue *StringQueue) toSlice(s []string) []string {
+func (queue *Uint64Queue) toSlice(s []uint64) []uint64 {
 	front, back := queue.frontAndBack()
 	copy(s, front)
 	if len(back) > 0 && len(s) >= len(front) {
@@ -204,13 +165,10 @@ func (queue *StringQueue) toSlice(s []string) []string {
 
 // ToInterfaceSlice returns the elements of the queue as a slice of arbitrary type.
 // The queue is not altered.
-func (queue *StringQueue) ToInterfaceSlice() []interface{} {
+func (queue *Uint64Queue) ToInterfaceSlice() []interface{} {
 	if queue == nil {
 		return nil
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	s := make([]interface{}, 0, queue.length)
@@ -226,24 +184,21 @@ func (queue *StringQueue) ToInterfaceSlice() []interface{} {
 }
 
 // Clone returns a shallow copy of the queue. It does not clone the underlying elements.
-func (queue *StringQueue) Clone() *StringQueue {
+func (queue *Uint64Queue) Clone() *Uint64Queue {
 	if queue == nil {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	buffer := queue.toSlice(make([]string, queue.capacity))
+	buffer := queue.toSlice(make([]uint64, queue.capacity))
 	return queue.doClone(buffer[:queue.length])
 }
 
-func (queue *StringQueue) doClone(buffer []string) *StringQueue {
+func (queue *Uint64Queue) doClone(buffer []uint64) *Uint64Queue {
 	w := 0
 	if len(buffer) < cap(buffer) {
 		w = len(buffer)
 	}
-	return &StringQueue{
+	return &Uint64Queue{
 		m:         buffer,
 		read:      0,
 		write:     w,
@@ -251,7 +206,6 @@ func (queue *StringQueue) doClone(buffer []string) *StringQueue {
 		capacity:  cap(buffer),
 		overwrite: queue.overwrite,
 		less:      queue.less,
-		s:         &sync.RWMutex{},
 	}
 }
 
@@ -259,9 +213,7 @@ func (queue *StringQueue) doClone(buffer []string) *StringQueue {
 
 // Get gets the specified element in the queue.
 // Panics if the index is out of range or the queue is nil.
-func (queue *StringQueue) Get(i int) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue *Uint64Queue) Get(i int) uint64 {
 
 	ri := (queue.read + i) % queue.capacity
 	return queue.m[ri]
@@ -269,25 +221,20 @@ func (queue *StringQueue) Get(i int) string {
 
 // Head gets the first element in the queue. Head is the opposite of Last.
 // Panics if queue is empty or nil.
-func (queue *StringQueue) Head() string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue *Uint64Queue) Head() uint64 {
 
 	return queue.m[queue.read]
 }
 
 // HeadOption returns the oldest item in the queue without removing it. If the queue
 // is nil or empty, it returns the zero value instead.
-func (queue *StringQueue) HeadOption() (string, bool) {
+func (queue *Uint64Queue) HeadOption() (uint64, bool) {
 	if queue == nil {
-		return "", false
+		return 0, false
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	if queue.length == 0 {
-		return "", false
+		return 0, false
 	}
 
 	return queue.m[queue.read], true
@@ -296,9 +243,7 @@ func (queue *StringQueue) HeadOption() (string, bool) {
 // Last gets the the newest item in the queue (i.e. last element pushed) without removing it.
 // Last is the opposite of Head.
 // Panics if queue is empty or nil.
-func (queue *StringQueue) Last() string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue *Uint64Queue) Last() uint64 {
 
 	i := queue.write - 1
 	if i < 0 {
@@ -310,16 +255,13 @@ func (queue *StringQueue) Last() string {
 
 // LastOption returns the newest item in the queue without removing it. If the queue
 // is nil empty, it returns the zero value instead.
-func (queue *StringQueue) LastOption() (string, bool) {
+func (queue *Uint64Queue) LastOption() (uint64, bool) {
 	if queue == nil {
-		return "", false
+		return 0, false
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	if queue.length == 0 {
-		return "", false
+		return 0, false
 	}
 
 	i := queue.write - 1
@@ -333,63 +275,53 @@ func (queue *StringQueue) LastOption() (string, bool) {
 //-------------------------------------------------------------------------------------------------
 
 // IsOverwriting returns true if the queue is overwriting, false if refusing.
-func (queue *StringQueue) IsOverwriting() bool {
+func (queue *Uint64Queue) IsOverwriting() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.overwrite
 }
 
 // IsFull returns true if the queue is full.
-func (queue *StringQueue) IsFull() bool {
+func (queue *Uint64Queue) IsFull() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length == queue.capacity
 }
 
 // IsEmpty returns true if the queue is empty.
-func (queue *StringQueue) IsEmpty() bool {
+func (queue *Uint64Queue) IsEmpty() bool {
 	if queue == nil {
 		return true
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length == 0
 }
 
 // NonEmpty returns true if the queue is not empty.
-func (queue *StringQueue) NonEmpty() bool {
+func (queue *Uint64Queue) NonEmpty() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length > 0
 }
 
 // Size gets the number of elements currently in this queue. This is an alias for Len.
-func (queue *StringQueue) Size() int {
+func (queue *Uint64Queue) Size() int {
 	if queue == nil {
 		return 0
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length
 }
 
 // Len gets the current length of this queue. This is an alias for Size.
-func (queue *StringQueue) Len() int {
+func (queue *Uint64Queue) Len() int {
 	return queue.Size()
 }
 
 // Swap swaps the elements with indexes i and j.
 // The queue must not be empty.
-func (queue *StringQueue) Swap(i, j int) {
+func (queue *Uint64Queue) Swap(i, j int) {
 	ri := (queue.read + i) % queue.capacity
 	rj := (queue.read + j) % queue.capacity
 	queue.m[ri], queue.m[rj] = queue.m[rj], queue.m[ri]
@@ -398,7 +330,7 @@ func (queue *StringQueue) Swap(i, j int) {
 // Less reports whether the element with index i should sort before the element with index j.
 // The queue must have been created with a non-nil 'less' comparison function and it must not
 // be empty.
-func (queue *StringQueue) Less(i, j int) bool {
+func (queue *Uint64Queue) Less(i, j int) bool {
 	ri := (queue.read + i) % queue.capacity
 	rj := (queue.read + j) % queue.capacity
 	return queue.less(queue.m[ri], queue.m[rj])
@@ -406,22 +338,22 @@ func (queue *StringQueue) Less(i, j int) bool {
 
 // Sort sorts the queue using the 'less' comparison function, which must not be nil.
 // This function will panic if the collection was created with a nil 'less' function
-// (see NewStringSortedQueue).
-func (queue *StringQueue) Sort() {
+// (see NewUint64SortedQueue).
+func (queue *Uint64Queue) Sort() {
 	sort.Sort(queue)
 }
 
 // StableSort sorts the queue using the 'less' comparison function, which must not be nil.
 // The result is stable so that repeated calls will not arbitrarily swap equal items.
 // This function will panic if the collection was created with a nil 'less' function
-// (see NewStringSortedQueue).
-func (queue *StringQueue) StableSort() {
+// (see NewUint64SortedQueue).
+func (queue *Uint64Queue) StableSort() {
 	sort.Stable(queue)
 }
 
 // frontAndBack gets the front and back portions of the queue. The front portion starts
 // from the read index. The back portion ends at the write index.
-func (queue *StringQueue) frontAndBack() ([]string, []string) {
+func (queue *Uint64Queue) frontAndBack() ([]uint64, []uint64) {
 	if queue == nil || queue.length == 0 {
 		return nil, nil
 	}
@@ -433,7 +365,7 @@ func (queue *StringQueue) frontAndBack() ([]string, []string) {
 
 // indexes gets the indexes for the front and back portions of the queue. The front
 // portion starts from the read index. The back portion ends at the write index.
-func (queue *StringQueue) indexes() []int {
+func (queue *Uint64Queue) indexes() []int {
 	if queue == nil || queue.length == 0 {
 		return nil
 	}
@@ -446,10 +378,8 @@ func (queue *StringQueue) indexes() []int {
 //-------------------------------------------------------------------------------------------------
 
 // Clear the entire queue.
-func (queue *StringQueue) Clear() {
+func (queue *Uint64Queue) Clear() {
 	if queue != nil {
-		queue.s.Lock()
-		defer queue.s.Unlock()
 		queue.read = 0
 		queue.write = 0
 		queue.length = 0
@@ -457,7 +387,7 @@ func (queue *StringQueue) Clear() {
 }
 
 // Add adds items to the queue. This is a synonym for Push.
-func (queue *StringQueue) Add(more ...string) {
+func (queue *Uint64Queue) Add(more ...uint64) {
 	queue.Push(more...)
 }
 
@@ -471,9 +401,7 @@ func (queue *StringQueue) Add(more ...string) {
 // without any older items being affected.
 //
 // The modified queue is returned.
-func (queue *StringQueue) Push(items ...string) *StringQueue {
-	queue.s.Lock()
-	defer queue.s.Unlock()
+func (queue *Uint64Queue) Push(items ...uint64) *Uint64Queue {
 
 	n := queue.capacity
 	if queue.overwrite && len(items) > queue.capacity {
@@ -506,13 +434,11 @@ func (queue *StringQueue) Push(items ...string) *StringQueue {
 //
 // If the capacity is too small for the number of items, the excess items are returned.
 // The queue capacity is never altered.
-func (queue *StringQueue) Offer(items ...string) []string {
-	queue.s.Lock()
-	defer queue.s.Unlock()
+func (queue *Uint64Queue) Offer(items ...uint64) []uint64 {
 	return queue.doPush(items...)
 }
 
-func (queue *StringQueue) doPush(items ...string) []string {
+func (queue *Uint64Queue) doPush(items ...uint64) []uint64 {
 	n := len(items)
 
 	space := queue.capacity - queue.length
@@ -555,12 +481,10 @@ func (queue *StringQueue) doPush(items ...string) []string {
 // Pop1 removes and returns the oldest item from the queue. If the queue is
 // empty, it returns the zero value instead.
 // The boolean is true only if the element was available.
-func (queue *StringQueue) Pop1() (string, bool) {
-	queue.s.Lock()
-	defer queue.s.Unlock()
+func (queue *Uint64Queue) Pop1() (uint64, bool) {
 
 	if queue.length == 0 {
-		return "", false
+		return 0, false
 	}
 
 	v := queue.m[queue.read]
@@ -574,13 +498,11 @@ func (queue *StringQueue) Pop1() (string, bool) {
 // empty, it returns a nil slice. If n is larger than the current queue length,
 // it returns all the available elements, so in this case the returned slice
 // will be shorter than n.
-func (queue *StringQueue) Pop(n int) []string {
-	queue.s.Lock()
-	defer queue.s.Unlock()
+func (queue *Uint64Queue) Pop(n int) []uint64 {
 	return queue.doPop(n)
 }
 
-func (queue *StringQueue) doPop(n int) []string {
+func (queue *Uint64Queue) doPop(n int) []uint64 {
 	if queue.length == 0 {
 		return nil
 	}
@@ -589,7 +511,7 @@ func (queue *StringQueue) doPop(n int) []string {
 		n = queue.length
 	}
 
-	s := make([]string, n)
+	s := make([]uint64, n)
 	front, back := queue.frontAndBack()
 	// note the length copied is whichever is shorter
 	copy(s, front)
@@ -606,21 +528,18 @@ func (queue *StringQueue) doPop(n int) []string {
 //-------------------------------------------------------------------------------------------------
 
 // Contains determines whether a given item is already in the queue, returning true if so.
-func (queue *StringQueue) Contains(v string) bool {
-	return queue.Exists(func(x string) bool {
+func (queue *Uint64Queue) Contains(v uint64) bool {
+	return queue.Exists(func(x uint64) bool {
 		return x == v
 	})
 }
 
 // ContainsAll determines whether the given items are all in the queue, returning true if so.
 // This is potentially a slow method and should only be used rarely.
-func (queue *StringQueue) ContainsAll(i ...string) bool {
+func (queue *Uint64Queue) ContainsAll(i ...uint64) bool {
 	if queue == nil {
 		return len(i) == 0
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	for _, v := range i {
 		if !queue.Contains(v) {
@@ -630,15 +549,12 @@ func (queue *StringQueue) ContainsAll(i ...string) bool {
 	return true
 }
 
-// Exists verifies that one or more elements of StringQueue return true for the predicate p.
+// Exists verifies that one or more elements of Uint64Queue return true for the predicate p.
 // The function should not alter the values via side-effects.
-func (queue *StringQueue) Exists(p func(string) bool) bool {
+func (queue *Uint64Queue) Exists(p func(uint64) bool) bool {
 	if queue == nil {
 		return false
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -654,15 +570,12 @@ func (queue *StringQueue) Exists(p func(string) bool) bool {
 	return false
 }
 
-// Forall verifies that all elements of StringQueue return true for the predicate p.
+// Forall verifies that all elements of Uint64Queue return true for the predicate p.
 // The function should not alter the values via side-effects.
-func (queue *StringQueue) Forall(p func(string) bool) bool {
+func (queue *Uint64Queue) Forall(p func(uint64) bool) bool {
 	if queue == nil {
 		return true
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -678,15 +591,12 @@ func (queue *StringQueue) Forall(p func(string) bool) bool {
 	return true
 }
 
-// Foreach iterates over StringQueue and executes function f against each element.
+// Foreach iterates over Uint64Queue and executes function f against each element.
 // The function can safely alter the values via side-effects.
-func (queue *StringQueue) Foreach(f func(string)) {
+func (queue *Uint64Queue) Foreach(f func(uint64)) {
 	if queue == nil {
 		return
 	}
-
-	queue.s.Lock()
-	defer queue.s.Unlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -700,12 +610,10 @@ func (queue *StringQueue) Foreach(f func(string)) {
 // Send returns a channel that will send all the elements in order.
 // A goroutine is created to send the elements; this only terminates when all the elements
 // have been consumed. The channel will be closed when all the elements have been sent.
-func (queue *StringQueue) Send() <-chan string {
-	ch := make(chan string)
+func (queue *Uint64Queue) Send() <-chan uint64 {
+	ch := make(chan uint64)
 	go func() {
 		if queue != nil {
-			queue.s.RLock()
-			defer queue.s.RUnlock()
 
 			front, back := queue.frontAndBack()
 			for _, v := range front {
@@ -722,17 +630,15 @@ func (queue *StringQueue) Send() <-chan string {
 
 //-------------------------------------------------------------------------------------------------
 
-// DoKeepWhere modifies a StringQueue by retaining only those elements that match
+// DoKeepWhere modifies a Uint64Queue by retaining only those elements that match
 // the predicate p. This is very similar to Filter but alters the queue in place.
 //
 // The queue is modified and the modified queue is returned.
-func (queue *StringQueue) DoKeepWhere(p func(string) bool) *StringQueue {
+func (queue *Uint64Queue) DoKeepWhere(p func(uint64) bool) *Uint64Queue {
 	if queue == nil {
 		return nil
 	}
 
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	if queue.length == 0 {
 		return queue
 	}
@@ -740,7 +646,7 @@ func (queue *StringQueue) DoKeepWhere(p func(string) bool) *StringQueue {
 	return queue.doKeepWhere(p)
 }
 
-func (queue *StringQueue) doKeepWhere(p func(string) bool) *StringQueue {
+func (queue *Uint64Queue) doKeepWhere(p func(uint64) bool) *Uint64Queue {
 	last := queue.capacity
 
 	if queue.write > queue.read {
@@ -794,15 +700,12 @@ func (queue *StringQueue) doKeepWhere(p func(string) bool) *StringQueue {
 
 //-------------------------------------------------------------------------------------------------
 
-// Find returns the first string that returns true for predicate p.
+// Find returns the first uint64 that returns true for predicate p.
 // False is returned if none match.
-func (queue *StringQueue) Find(p func(string) bool) (string, bool) {
+func (queue *Uint64Queue) Find(p func(uint64) bool) (uint64, bool) {
 	if queue == nil {
-		return "", false
+		return 0, false
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -816,22 +719,19 @@ func (queue *StringQueue) Find(p func(string) bool) (string, bool) {
 		}
 	}
 
-	var empty string
+	var empty uint64
 	return empty, false
 }
 
-// Filter returns a new StringQueue whose elements return true for predicate p.
+// Filter returns a new Uint64Queue whose elements return true for predicate p.
 //
 // The original queue is not modified. See also DoKeepWhere (which does modify the original queue).
-func (queue *StringQueue) Filter(p func(string) bool) *StringQueue {
+func (queue *Uint64Queue) Filter(p func(uint64) bool) *Uint64Queue {
 	if queue == nil {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	result := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
+	result := NewUint64SortedQueue(queue.length, queue.overwrite, queue.less)
 	i := 0
 
 	front, back := queue.frontAndBack()
@@ -853,22 +753,19 @@ func (queue *StringQueue) Filter(p func(string) bool) *StringQueue {
 	return result
 }
 
-// Partition returns two new StringQueues whose elements return true or false for the predicate, p.
+// Partition returns two new Uint64Queues whose elements return true or false for the predicate, p.
 // The first result consists of all elements that satisfy the predicate and the second result consists of
 // all elements that don't. The relative order of the elements in the results is the same as in the
 // original queue.
 //
 // The original queue is not modified
-func (queue *StringQueue) Partition(p func(string) bool) (*StringQueue, *StringQueue) {
+func (queue *Uint64Queue) Partition(p func(uint64) bool) (*Uint64Queue, *Uint64Queue) {
 	if queue == nil {
 		return nil, nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	matching := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
-	others := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
+	matching := NewUint64SortedQueue(queue.length, queue.overwrite, queue.less)
+	others := NewUint64SortedQueue(queue.length, queue.overwrite, queue.less)
 	m, o := 0, 0
 
 	front, back := queue.frontAndBack()
@@ -898,21 +795,18 @@ func (queue *StringQueue) Partition(p func(string) bool) (*StringQueue, *StringQ
 	return matching, others
 }
 
-// Map returns a new StringQueue by transforming every element with function f.
+// Map returns a new Uint64Queue by transforming every element with function f.
 // The resulting queue is the same size as the original queue.
 // The original queue is not modified.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (queue *StringQueue) Map(f func(string) string) *StringQueue {
+func (queue *Uint64Queue) Map(f func(uint64) uint64) *Uint64Queue {
 	if queue == nil {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	slice := make([]string, queue.length)
+	slice := make([]uint64, queue.length)
 	i := 0
 
 	front, back := queue.frontAndBack()
@@ -928,20 +822,18 @@ func (queue *StringQueue) Map(f func(string) string) *StringQueue {
 	return queue.doClone(slice)
 }
 
-// MapToInt returns a new []int by transforming every element with function f.
+// MapToString returns a new []string by transforming every element with function f.
 // The resulting slice is the same size as the queue.
 // The queue is not modified.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (queue *StringQueue) MapToInt(f func(string) int) []int {
+func (queue *Uint64Queue) MapToString(f func(uint64) string) []string {
 	if queue == nil {
 		return nil
 	}
 
-	result := make([]int, 0, queue.length)
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+	result := make([]string, 0, queue.length)
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -954,18 +846,18 @@ func (queue *StringQueue) MapToInt(f func(string) int) []int {
 	return result
 }
 
-// FlatMap returns a new StringQueue by transforming every element with function f that
+// FlatMap returns a new Uint64Queue by transforming every element with function f that
 // returns zero or more items in a slice. The resulting queue may have a different size to the original queue.
 // The original queue is not modified.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (queue *StringQueue) FlatMap(f func(string) []string) *StringQueue {
+func (queue *Uint64Queue) FlatMap(f func(uint64) []uint64) *Uint64Queue {
 	if queue == nil {
 		return nil
 	}
 
-	slice := make([]string, 0, queue.length)
+	slice := make([]uint64, 0, queue.length)
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -978,20 +870,18 @@ func (queue *StringQueue) FlatMap(f func(string) []string) *StringQueue {
 	return queue.doClone(slice)
 }
 
-// FlatMapToInt returns a new []int by transforming every element with function f that
+// FlatMapToString returns a new []string by transforming every element with function f that
 // returns zero or more items in a slice. The resulting slice may have a different size to the queue.
 // The queue is not modified.
 //
 // This is a domain-to-range mapping function. For bespoke transformations to other types, copy and modify
 // this method appropriately.
-func (queue *StringQueue) FlatMapToInt(f func(string) []int) []int {
+func (queue *Uint64Queue) FlatMapToString(f func(uint64) []string) []string {
 	if queue == nil {
 		return nil
 	}
 
-	result := make([]int, 0, 32)
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+	result := make([]string, 0, 32)
 
 	for _, v := range queue.m {
 		result = append(result, f(v)...)
@@ -1000,14 +890,11 @@ func (queue *StringQueue) FlatMapToInt(f func(string) []int) []int {
 	return result
 }
 
-// CountBy gives the number elements of StringQueue that return true for the predicate p.
-func (queue *StringQueue) CountBy(p func(string) bool) (result int) {
+// CountBy gives the number elements of Uint64Queue that return true for the predicate p.
+func (queue *Uint64Queue) CountBy(p func(uint64) bool) (result int) {
 	if queue == nil {
 		return 0
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -1024,13 +911,10 @@ func (queue *StringQueue) CountBy(p func(string) bool) (result int) {
 }
 
 // Fold aggregates all the values in the queue using a supplied function, starting from some initial value.
-func (queue *StringQueue) Fold(initial string, fn func(string, string) string) string {
+func (queue *Uint64Queue) Fold(initial uint64, fn func(uint64, uint64) uint64) uint64 {
 	if queue == nil {
 		return initial
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	m := initial
 	front, back := queue.frontAndBack()
@@ -1043,12 +927,10 @@ func (queue *StringQueue) Fold(initial string, fn func(string, string) string) s
 	return m
 }
 
-// MinBy returns an element of StringQueue containing the minimum value, when compared to other elements
+// MinBy returns an element of Uint64Queue containing the minimum value, when compared to other elements
 // using a passed func defining ‘less’. In the case of multiple items being equally minimal, the first such
 // element is returned. Panics if there are no elements.
-func (queue *StringQueue) MinBy(less func(string, string) bool) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue *Uint64Queue) MinBy(less func(uint64, uint64) bool) uint64 {
 
 	if queue.length == 0 {
 		panic("Cannot determine the minimum of an empty queue.")
@@ -1070,12 +952,10 @@ func (queue *StringQueue) MinBy(less func(string, string) bool) string {
 	return queue.m[m]
 }
 
-// MaxBy returns an element of StringQueue containing the maximum value, when compared to other elements
+// MaxBy returns an element of Uint64Queue containing the maximum value, when compared to other elements
 // using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 // element is returned. Panics if there are no elements.
-func (queue *StringQueue) MaxBy(less func(string, string) bool) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue *Uint64Queue) MaxBy(less func(uint64, uint64) bool) uint64 {
 
 	if queue.length == 0 {
 		panic("Cannot determine the maximum of an empty queue.")
@@ -1098,32 +978,23 @@ func (queue *StringQueue) MaxBy(less func(string, string) bool) string {
 }
 
 //-------------------------------------------------------------------------------------------------
-// These methods are included when string is comparable.
+// These methods are included when uint64 is comparable.
 
 // Equals determines if two queues are equal to each other.
 // If they both are the same size and have the same items they are considered equal.
 // Order of items is not relevent for sets to be equal.
 // Nil queues are considered to be empty.
-func (queue *StringQueue) Equals(other *StringQueue) bool {
+func (queue *Uint64Queue) Equals(other *Uint64Queue) bool {
 	if queue == nil {
 		if other == nil {
 			return true
 		}
-		other.s.RLock()
-		defer other.s.RUnlock()
 		return other.length == 0
 	}
 
 	if other == nil {
-		queue.s.RLock()
-		defer queue.s.RUnlock()
 		return queue.length == 0
 	}
-
-	queue.s.RLock()
-	other.s.RLock()
-	defer queue.s.RUnlock()
-	defer other.s.RUnlock()
 
 	if queue.length != other.length {
 		return false
@@ -1141,24 +1012,107 @@ func (queue *StringQueue) Equals(other *StringQueue) bool {
 }
 
 //-------------------------------------------------------------------------------------------------
+// These methods are included when uint64 is ordered.
+
+// Min returns the first element containing the minimum value, when compared to other elements.
+// Panics if the collection is empty.
+func (queue *Uint64Queue) Min() uint64 {
+
+	if queue.length == 0 {
+		panic("Cannot determine the minimum of an empty queue.")
+	}
+
+	z := queue.m[queue.read]
+	m := z
+	front, back := queue.frontAndBack()
+	for _, v := range front {
+		if v < m {
+			m = v
+		}
+	}
+	for _, v := range back {
+		if v < m {
+			m = v
+		}
+	}
+	return m
+}
+
+// Max returns the first element containing the maximum value, when compared to other elements.
+// Panics if the collection is empty.
+func (queue *Uint64Queue) Max() (result uint64) {
+
+	if queue.length == 0 {
+		panic("Cannot determine the maximum of an empty queue.")
+	}
+
+	z := queue.m[queue.read]
+	m := z
+	front, back := queue.frontAndBack()
+	for _, v := range front {
+		if v > m {
+			m = v
+		}
+	}
+	for _, v := range back {
+		if v > m {
+			m = v
+		}
+	}
+	return m
+}
+
+//-------------------------------------------------------------------------------------------------
+// These methods are included when uint64 is numeric.
+
+// Sum returns the sum of all the elements in the queue.
+func (queue *Uint64Queue) Sum() uint64 {
+
+	sum := uint64(0)
+	front, back := queue.frontAndBack()
+	for _, v := range front {
+		sum = sum + v
+	}
+	for _, v := range back {
+		sum = sum + v
+	}
+	return sum
+}
+
+//-------------------------------------------------------------------------------------------------
 
 // StringList gets a list of strings that depicts all the elements.
-func (queue *StringQueue) StringList() []string {
-	return queue.ToSlice()
+func (queue *Uint64Queue) StringList() []string {
+	if queue == nil {
+		return nil
+	}
+
+	strings := make([]string, queue.length)
+	i := 0
+	front, back := queue.frontAndBack()
+	for _, v := range front {
+		strings[i] = fmt.Sprintf("%v", v)
+		i++
+	}
+	for _, v := range back {
+		strings[i] = fmt.Sprintf("%v", v)
+		i++
+	}
+	return strings
 }
 
 // String implements the Stringer interface to render the queue as a comma-separated string enclosed in square brackets.
-func (queue *StringQueue) String() string {
+func (queue *Uint64Queue) String() string {
 	return queue.MkString3("[", ", ", "]")
 }
 
 // MkString concatenates the values as a string using a supplied separator. No enclosing marks are added.
-func (queue *StringQueue) MkString(sep string) string {
+func (queue *Uint64Queue) MkString(sep string) string {
 	return queue.MkString3("", sep, "")
 }
 
 // MkString3 concatenates the values as a string, using the prefix, separator and suffix supplied.
-func (queue *StringQueue) MkString3(before, between, after string) string {
+func (queue *Uint64Queue) MkString3(before, between, after string) string {
 	if queue == nil {
 		return ""
 	}
@@ -1166,13 +1120,10 @@ func (queue *StringQueue) MkString3(before, between, after string) string {
 	return queue.mkString3Bytes(before, between, after).String()
 }
 
-func (queue StringQueue) mkString3Bytes(before, between, after string) *strings.Builder {
+func (queue Uint64Queue) mkString3Bytes(before, between, after string) *strings.Builder {
 	b := &strings.Builder{}
 	b.WriteString(before)
 	sep := ""
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -1192,17 +1143,13 @@ func (queue StringQueue) mkString3Bytes(before, between, after string) *strings.
 //-------------------------------------------------------------------------------------------------
 
 // UnmarshalJSON implements JSON decoding for this queue type.
-func (queue *StringQueue) UnmarshalJSON(b []byte) error {
-	queue.s.Lock()
-	defer queue.s.Unlock()
+func (queue *Uint64Queue) UnmarshalJSON(b []byte) error {
 
 	return json.Unmarshal(b, &queue.m)
 }
 
 // MarshalJSON implements JSON encoding for this queue type.
-func (queue StringQueue) MarshalJSON() ([]byte, error) {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
+func (queue Uint64Queue) MarshalJSON() ([]byte, error) {
 
 	buf, err := json.Marshal(queue.m)
 	return buf, err

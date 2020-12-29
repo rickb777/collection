@@ -6,22 +6,21 @@
 //
 // The queue provides a method to sort its elements.
 //
-// Thread-safe.
+// Not thread-safe.
 //
-// Generated from threadsafe/queue.tpl with Type=string
+// Generated from fast/queue.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Ordered:<no value> Sorted:<no value> Stringer:true
-// ToList:true ToSet:true
+// ToList:false ToSet:false
 // by runtemplate v3.7.1
 // See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
 
-package shared
+package collection
 
 import (
 	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
-	"sync"
 )
 
 // StringQueue is a ring buffer containing a slice of type string. It is optimised
@@ -34,7 +33,6 @@ type StringQueue struct {
 	capacity  int
 	overwrite bool
 	less      func(i, j string) bool
-	s         *sync.RWMutex
 }
 
 // NewStringQueue returns a new queue of string. The behaviour when adding
@@ -57,7 +55,6 @@ func NewStringSortedQueue(capacity int, overwrite bool, less func(i, j string) b
 		capacity:  capacity,
 		overwrite: overwrite,
 		less:      less,
-		s:         &sync.RWMutex{},
 	}
 }
 
@@ -92,8 +89,6 @@ func (queue *StringQueue) Reallocate(capacity int, overwrite bool) *StringQueue 
 		panic("capacity must be at least 1")
 	}
 
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	return queue.doReallocate(capacity, overwrite)
 }
 
@@ -127,8 +122,6 @@ func (queue *StringQueue) Space() int {
 	if queue == nil {
 		return 0
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.capacity - queue.length
 }
 
@@ -152,43 +145,11 @@ func (queue *StringQueue) IsSet() bool {
 	return false
 }
 
-// ToList returns the elements of the queue as a list. The returned list is a shallow
-// copy; the queue is not altered.
-func (queue *StringQueue) ToList() *StringList {
-	if queue == nil {
-		return nil
-	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	list := MakeStringList(queue.length, queue.length)
-	queue.toSlice(list.m)
-	return list
-}
-
-// ToSet returns the elements of the queue as a set. The returned set is a shallow
-// copy; the queue is not altered.
-func (queue *StringQueue) ToSet() *StringSet {
-	if queue == nil {
-		return nil
-	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
-	slice := queue.toSlice(make([]string, queue.length))
-	return NewStringSet(slice...)
-}
-
 // ToSlice returns the elements of the queue as a slice. The queue is not altered.
 func (queue *StringQueue) ToSlice() []string {
 	if queue == nil {
 		return nil
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	return queue.toSlice(make([]string, queue.length))
 }
@@ -209,9 +170,6 @@ func (queue *StringQueue) ToInterfaceSlice() []interface{} {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	front, back := queue.frontAndBack()
 	s := make([]interface{}, 0, queue.length)
 	for _, v := range front {
@@ -231,9 +189,6 @@ func (queue *StringQueue) Clone() *StringQueue {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	buffer := queue.toSlice(make([]string, queue.capacity))
 	return queue.doClone(buffer[:queue.length])
 }
@@ -251,7 +206,6 @@ func (queue *StringQueue) doClone(buffer []string) *StringQueue {
 		capacity:  cap(buffer),
 		overwrite: queue.overwrite,
 		less:      queue.less,
-		s:         &sync.RWMutex{},
 	}
 }
 
@@ -260,8 +214,6 @@ func (queue *StringQueue) doClone(buffer []string) *StringQueue {
 // Get gets the specified element in the queue.
 // Panics if the index is out of range or the queue is nil.
 func (queue *StringQueue) Get(i int) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	ri := (queue.read + i) % queue.capacity
 	return queue.m[ri]
@@ -270,8 +222,6 @@ func (queue *StringQueue) Get(i int) string {
 // Head gets the first element in the queue. Head is the opposite of Last.
 // Panics if queue is empty or nil.
 func (queue *StringQueue) Head() string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	return queue.m[queue.read]
 }
@@ -282,9 +232,6 @@ func (queue *StringQueue) HeadOption() (string, bool) {
 	if queue == nil {
 		return "", false
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
 		return "", false
@@ -297,8 +244,6 @@ func (queue *StringQueue) HeadOption() (string, bool) {
 // Last is the opposite of Head.
 // Panics if queue is empty or nil.
 func (queue *StringQueue) Last() string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	i := queue.write - 1
 	if i < 0 {
@@ -314,9 +259,6 @@ func (queue *StringQueue) LastOption() (string, bool) {
 	if queue == nil {
 		return "", false
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
 		return "", false
@@ -337,8 +279,6 @@ func (queue *StringQueue) IsOverwriting() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.overwrite
 }
 
@@ -347,8 +287,6 @@ func (queue *StringQueue) IsFull() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length == queue.capacity
 }
 
@@ -357,8 +295,6 @@ func (queue *StringQueue) IsEmpty() bool {
 	if queue == nil {
 		return true
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length == 0
 }
 
@@ -367,8 +303,6 @@ func (queue *StringQueue) NonEmpty() bool {
 	if queue == nil {
 		return false
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length > 0
 }
 
@@ -377,8 +311,6 @@ func (queue *StringQueue) Size() int {
 	if queue == nil {
 		return 0
 	}
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 	return queue.length
 }
 
@@ -448,8 +380,6 @@ func (queue *StringQueue) indexes() []int {
 // Clear the entire queue.
 func (queue *StringQueue) Clear() {
 	if queue != nil {
-		queue.s.Lock()
-		defer queue.s.Unlock()
 		queue.read = 0
 		queue.write = 0
 		queue.length = 0
@@ -472,8 +402,6 @@ func (queue *StringQueue) Add(more ...string) {
 //
 // The modified queue is returned.
 func (queue *StringQueue) Push(items ...string) *StringQueue {
-	queue.s.Lock()
-	defer queue.s.Unlock()
 
 	n := queue.capacity
 	if queue.overwrite && len(items) > queue.capacity {
@@ -507,8 +435,6 @@ func (queue *StringQueue) Push(items ...string) *StringQueue {
 // If the capacity is too small for the number of items, the excess items are returned.
 // The queue capacity is never altered.
 func (queue *StringQueue) Offer(items ...string) []string {
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	return queue.doPush(items...)
 }
 
@@ -556,8 +482,6 @@ func (queue *StringQueue) doPush(items ...string) []string {
 // empty, it returns the zero value instead.
 // The boolean is true only if the element was available.
 func (queue *StringQueue) Pop1() (string, bool) {
-	queue.s.Lock()
-	defer queue.s.Unlock()
 
 	if queue.length == 0 {
 		return "", false
@@ -575,8 +499,6 @@ func (queue *StringQueue) Pop1() (string, bool) {
 // it returns all the available elements, so in this case the returned slice
 // will be shorter than n.
 func (queue *StringQueue) Pop(n int) []string {
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	return queue.doPop(n)
 }
 
@@ -619,9 +541,6 @@ func (queue *StringQueue) ContainsAll(i ...string) bool {
 		return len(i) == 0
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	for _, v := range i {
 		if !queue.Contains(v) {
 			return false
@@ -636,9 +555,6 @@ func (queue *StringQueue) Exists(p func(string) bool) bool {
 	if queue == nil {
 		return false
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -661,9 +577,6 @@ func (queue *StringQueue) Forall(p func(string) bool) bool {
 		return true
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	front, back := queue.frontAndBack()
 	for _, v := range front {
 		if !p(v) {
@@ -685,9 +598,6 @@ func (queue *StringQueue) Foreach(f func(string)) {
 		return
 	}
 
-	queue.s.Lock()
-	defer queue.s.Unlock()
-
 	front, back := queue.frontAndBack()
 	for _, v := range front {
 		f(v)
@@ -704,8 +614,6 @@ func (queue *StringQueue) Send() <-chan string {
 	ch := make(chan string)
 	go func() {
 		if queue != nil {
-			queue.s.RLock()
-			defer queue.s.RUnlock()
 
 			front, back := queue.frontAndBack()
 			for _, v := range front {
@@ -731,8 +639,6 @@ func (queue *StringQueue) DoKeepWhere(p func(string) bool) *StringQueue {
 		return nil
 	}
 
-	queue.s.Lock()
-	defer queue.s.Unlock()
 	if queue.length == 0 {
 		return queue
 	}
@@ -801,9 +707,6 @@ func (queue *StringQueue) Find(p func(string) bool) (string, bool) {
 		return "", false
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	front, back := queue.frontAndBack()
 	for _, v := range front {
 		if p(v) {
@@ -827,9 +730,6 @@ func (queue *StringQueue) Filter(p func(string) bool) *StringQueue {
 	if queue == nil {
 		return nil
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	result := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
 	i := 0
@@ -863,9 +763,6 @@ func (queue *StringQueue) Partition(p func(string) bool) (*StringQueue, *StringQ
 	if queue == nil {
 		return nil, nil
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	matching := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
 	others := NewStringSortedQueue(queue.length, queue.overwrite, queue.less)
@@ -909,9 +806,6 @@ func (queue *StringQueue) Map(f func(string) string) *StringQueue {
 		return nil
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	slice := make([]string, queue.length)
 	i := 0
 
@@ -940,8 +834,6 @@ func (queue *StringQueue) MapToInt(f func(string) int) []int {
 	}
 
 	result := make([]int, 0, queue.length)
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -990,8 +882,6 @@ func (queue *StringQueue) FlatMapToInt(f func(string) []int) []int {
 	}
 
 	result := make([]int, 0, 32)
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	for _, v := range queue.m {
 		result = append(result, f(v)...)
@@ -1005,9 +895,6 @@ func (queue *StringQueue) CountBy(p func(string) bool) (result int) {
 	if queue == nil {
 		return 0
 	}
-
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -1029,9 +916,6 @@ func (queue *StringQueue) Fold(initial string, fn func(string, string) string) s
 		return initial
 	}
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	m := initial
 	front, back := queue.frontAndBack()
 	for _, v := range front {
@@ -1047,8 +931,6 @@ func (queue *StringQueue) Fold(initial string, fn func(string, string) string) s
 // using a passed func defining ‘less’. In the case of multiple items being equally minimal, the first such
 // element is returned. Panics if there are no elements.
 func (queue *StringQueue) MinBy(less func(string, string) bool) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
 		panic("Cannot determine the minimum of an empty queue.")
@@ -1074,8 +956,6 @@ func (queue *StringQueue) MinBy(less func(string, string) bool) string {
 // using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 // element is returned. Panics if there are no elements.
 func (queue *StringQueue) MaxBy(less func(string, string) bool) string {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	if queue.length == 0 {
 		panic("Cannot determine the maximum of an empty queue.")
@@ -1109,21 +989,12 @@ func (queue *StringQueue) Equals(other *StringQueue) bool {
 		if other == nil {
 			return true
 		}
-		other.s.RLock()
-		defer other.s.RUnlock()
 		return other.length == 0
 	}
 
 	if other == nil {
-		queue.s.RLock()
-		defer queue.s.RUnlock()
 		return queue.length == 0
 	}
-
-	queue.s.RLock()
-	other.s.RLock()
-	defer queue.s.RUnlock()
-	defer other.s.RUnlock()
 
 	if queue.length != other.length {
 		return false
@@ -1171,9 +1042,6 @@ func (queue StringQueue) mkString3Bytes(before, between, after string) *strings.
 	b.WriteString(before)
 	sep := ""
 
-	queue.s.RLock()
-	defer queue.s.RUnlock()
-
 	front, back := queue.frontAndBack()
 	for _, v := range front {
 		b.WriteString(sep)
@@ -1193,16 +1061,12 @@ func (queue StringQueue) mkString3Bytes(before, between, after string) *strings.
 
 // UnmarshalJSON implements JSON decoding for this queue type.
 func (queue *StringQueue) UnmarshalJSON(b []byte) error {
-	queue.s.Lock()
-	defer queue.s.Unlock()
 
 	return json.Unmarshal(b, &queue.m)
 }
 
 // MarshalJSON implements JSON encoding for this queue type.
 func (queue StringQueue) MarshalJSON() ([]byte, error) {
-	queue.s.RLock()
-	defer queue.s.RUnlock()
 
 	buf, err := json.Marshal(queue.m)
 	return buf, err

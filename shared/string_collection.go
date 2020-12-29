@@ -13,13 +13,13 @@ type StringSizer interface {
 	// NonEmpty tests whether StringCollection is empty.
 	NonEmpty() bool
 
-	// Size returns the number of items in the list - an alias of Len().
+	// Size returns the number of items in the collection - an alias of Len().
 	Size() int
 }
 
 // StringMkStringer defines an interface for stringer methods on string collections.
 type StringMkStringer interface {
-	// String implements the Stringer interface to render the list as a comma-separated string enclosed
+	// String implements the Stringer interface to render the collection as a comma-separated string enclosed
 	// in square brackets.
 	String() string
 
@@ -35,7 +35,7 @@ type StringMkStringer interface {
 	// implements json.Unmarshaler interface {
 	UnmarshalJSON(b []byte) error
 
-	// StringList gets a list of strings that depicts all the elements.
+	// StringList gets a collection of strings that depicts all the elements.
 	StringList() []string
 }
 
@@ -49,9 +49,6 @@ type StringCollection interface {
 
 	// IsSet returns false for lists and queues.
 	IsSet() bool
-
-	// ToSet returns a shallow copy as a set.
-	ToSet() *StringSet
 
 	// ToSlice returns a shallow copy as a plain slice.
 	ToSlice() []string
@@ -77,7 +74,7 @@ type StringCollection interface {
 	MapToInt(f func(string) int) []int
 
 	// FlatMapInt returns a new []int by transforming every element with function f
-	// that returns zero or more items in a slice. The resulting list may have a different size to the
+	// that returns zero or more items in a slice. The resulting slice may have a different size to the
 	// collection. The collection is not modified.
 	FlatMapToInt(f func(string) []int) []int
 
@@ -109,4 +106,24 @@ type StringCollection interface {
 	// using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 	// element is returned. Panics if there are no elements.
 	MaxBy(less func(string, string) bool) string
+
+	// Fold aggregates all the values in the collection using a supplied function, starting from some initial value.
+	Fold(initial string, fn func(string, string) string) string
+}
+
+// StringSequence defines an interface for sequence methods on string.
+type StringSequence interface {
+	StringCollection
+
+	// Head gets the first element in the sequence. Head plus Tail include the whole sequence. Head is the opposite of Last.
+	Head() string
+
+	// HeadOption gets the first element in the sequence, if possible.
+	HeadOption() (string, bool)
+
+	// Last gets the last element in the sequence. Init plus Last include the whole sequence. Last is the opposite of Head.
+	Last() string
+
+	// LastOption gets the last element in the sequence, if possible.
+	LastOption() (string, bool)
 }

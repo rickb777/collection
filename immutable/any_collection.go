@@ -32,7 +32,7 @@ type AnyMkStringer interface {
 	// implements json.Marshaler interface {
 	MarshalJSON() ([]byte, error)
 
-	// StringList gets a list of strings that depicts all the elements.
+	// StringList gets a slice of strings that depicts all the elements.
 	StringList() []string
 }
 
@@ -46,9 +46,6 @@ type AnyCollection interface {
 
 	// IsSet returns false for lists and queues.
 	IsSet() bool
-
-	// ToSet returns a shallow copy as a set.
-	ToSet() *AnySet
 
 	// ToSlice returns a shallow copy as a plain slice.
 	ToSlice() []interface{}
@@ -91,4 +88,24 @@ type AnyCollection interface {
 	// using a passed func defining ‘less’. In the case of multiple items being equally maximal, the first such
 	// element is returned. Panics if there are no elements.
 	MaxBy(less func(interface{}, interface{}) bool) interface{}
+
+	// Fold aggregates all the values in the collection using a supplied function, starting from some initial value.
+	Fold(initial interface{}, fn func(interface{}, interface{}) interface{}) interface{}
+}
+
+// AnySequence defines an interface for sequence methods on interface{}.
+type AnySequence interface {
+	AnyCollection
+
+	// Head gets the first element in the sequence. Head plus Tail include the whole sequence. Head is the opposite of Last.
+	Head() interface{}
+
+	// HeadOption gets the first element in the sequence, if possible.
+	HeadOption() (interface{}, bool)
+
+	// Last gets the last element in the sequence. Init plus Last include the whole sequence. Last is the opposite of Head.
+	Last() interface{}
+
+	// LastOption gets the last element in the sequence, if possible.
+	LastOption() (interface{}, bool)
 }
