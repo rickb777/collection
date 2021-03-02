@@ -3,9 +3,9 @@
 //
 //
 // Generated from immutable/set.tpl with Type=uint64
-// options: Comparable:always Numeric:true Ordered:true Stringer:true Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Comparable:always Numeric:<no value> Integer:true Ordered:true Stringer:true Mutable:disabled
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 
@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -40,6 +41,18 @@ func ConvertUint64Set(values ...interface{}) (*Uint64Set, bool) {
 	set := NewUint64Set()
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := uint64(j)
@@ -119,8 +132,8 @@ func ConvertUint64Set(values ...interface{}) (*Uint64Set, bool) {
 	return set, len(set.m) == len(values)
 }
 
-// BuildUint64SetFromChan constructs a new Uint64Set from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildUint64SetFromChan constructs a new Uint64Set from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildUint64SetFromChan(source <-chan uint64) *Uint64Set {
 	set := NewUint64Set()
 	for v := range source {

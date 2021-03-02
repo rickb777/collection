@@ -3,9 +3,9 @@
 //
 //
 // Generated from immutable/set.tpl with Type=int
-// options: Comparable:always Numeric:true Ordered:true Stringer:true Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Comparable:always Numeric:<no value> Integer:true Ordered:true Stringer:true Mutable:disabled
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 
@@ -14,6 +14,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -40,6 +41,18 @@ func ConvertIntSet(values ...interface{}) (*IntSet, bool) {
 	set := NewIntSet()
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := int(j)
@@ -119,8 +132,8 @@ func ConvertIntSet(values ...interface{}) (*IntSet, bool) {
 	return set, len(set.m) == len(values)
 }
 
-// BuildIntSetFromChan constructs a new IntSet from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildIntSetFromChan constructs a new IntSet from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildIntSetFromChan(source <-chan int) *IntSet {
 	set := NewIntSet()
 	for v := range source {

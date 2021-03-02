@@ -3,9 +3,9 @@
 // Not thread-safe.
 //
 // Generated from simple/set.tpl with Type=string
-// options: Numeric:<no value> Stringer:true Mutable:always
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Numeric:<no value> Integer:<no value> Stringer:true Mutable:always
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package collection
 
@@ -30,6 +30,7 @@ func NewStringSet(values ...string) StringSet {
 
 // ConvertStringSet constructs a new set containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
+// The returned set will contain all the values that were correctly converted.
 func ConvertStringSet(values ...interface{}) (StringSet, bool) {
 	set := make(StringSet)
 
@@ -47,8 +48,8 @@ func ConvertStringSet(values ...interface{}) (StringSet, bool) {
 	return set, len(set) == len(values)
 }
 
-// BuildStringSetFromChan constructs a new StringSet from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildStringSetFromChan constructs a new StringSet from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildStringSetFromChan(source <-chan string) StringSet {
 	set := make(StringSet)
 	for v := range source {

@@ -3,9 +3,10 @@
 //
 //
 // Generated from immutable/list.tpl with Type=uint64
-// options: Comparable:true Numeric:true Ordered:true Stringer:true GobEncode:true Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Comparable:true Numeric:<no value> Integer:true Ordered:true
+//          StringLike:<no value> StringParser:<no value> Stringer:true
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 
@@ -16,6 +17,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -48,10 +50,23 @@ func NewUint64List(values ...uint64) *Uint64List {
 // ConvertUint64List constructs a new list containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
 // The returned list will contain all the values that were correctly converted.
+// Conversions are provided from all built-in numeric types.
 func ConvertUint64List(values ...interface{}) (*Uint64List, bool) {
 	list := newUint64List(0, len(values))
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := uint64(j)

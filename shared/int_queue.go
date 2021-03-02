@@ -9,10 +9,10 @@
 // Thread-safe.
 //
 // Generated from threadsafe/queue.tpl with Type=int
-// options: Comparable:true Numeric:true Ordered:true Sorted:<no value> Stringer:true
+// options: Comparable:true Numeric:<no value> Ordered:true Sorted:<no value> Stringer:true
 // ToList:true ToSet:true
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
 

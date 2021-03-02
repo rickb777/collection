@@ -2,10 +2,11 @@
 // Thread-safe.
 //
 // Generated from threadsafe/list.tpl with Type=string
-// options: Comparable:true Numeric:<no value> Ordered:<no value> StringLike:<no value> Stringer:true
+// options: Comparable:true Numeric:<no value> Integer:<no value> Ordered:<no value>
+//          StringLike:<no value> StringParser:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:int
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
 

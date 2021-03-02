@@ -3,9 +3,9 @@
 // Not thread-safe.
 //
 // Generated from simple/set.tpl with Type=uint64
-// options: Numeric:true Stringer:true Mutable:always
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Numeric:<no value> Integer:true Stringer:true Mutable:always
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package collection
 
@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -30,10 +31,23 @@ func NewUint64Set(values ...uint64) Uint64Set {
 
 // ConvertUint64Set constructs a new set containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
+// The returned set will contain all the values that were correctly converted.
 func ConvertUint64Set(values ...interface{}) (Uint64Set, bool) {
 	set := make(Uint64Set)
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := uint64(j)
@@ -113,8 +127,8 @@ func ConvertUint64Set(values ...interface{}) (Uint64Set, bool) {
 	return set, len(set) == len(values)
 }
 
-// BuildUint64SetFromChan constructs a new Uint64Set from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildUint64SetFromChan constructs a new Uint64Set from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildUint64SetFromChan(source <-chan uint64) Uint64Set {
 	set := make(Uint64Set)
 	for v := range source {

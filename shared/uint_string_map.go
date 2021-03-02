@@ -4,8 +4,8 @@
 //
 // Generated from threadsafe/map.tpl with Key=uint Type=string
 // options: Comparable:true Stringer:true KeyList:collection.UintList ValueList:collection.StringList Mutable:always
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
 

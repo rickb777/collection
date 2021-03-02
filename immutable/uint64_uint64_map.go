@@ -4,8 +4,8 @@
 //
 // Generated from immutable/map.tpl with Key=uint64 Type=uint64
 // options: Comparable:true Stringer:true KeyList:collection.Uint64List ValueList:collection.Uint64List Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 

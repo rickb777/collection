@@ -3,9 +3,9 @@
 //
 //
 // Generated from immutable/set.tpl with Type=string
-// options: Comparable:always Numeric:<no value> Ordered:<no value> Stringer:true Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Comparable:always Numeric:<no value> Integer:<no value> Ordered:<no value> Stringer:true Mutable:disabled
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 
@@ -51,8 +51,8 @@ func ConvertStringSet(values ...interface{}) (*StringSet, bool) {
 	return set, len(set.m) == len(values)
 }
 
-// BuildStringSetFromChan constructs a new StringSet from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildStringSetFromChan constructs a new StringSet from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildStringSetFromChan(source <-chan string) *StringSet {
 	set := NewStringSet()
 	for v := range source {

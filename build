@@ -4,7 +4,7 @@ BASE=$PWD
 
 FIRST=$(go env GOPATH | cut -d: -f1)
 PATH=$FIRST/bin:$PATH
-RVSN=v3.9.0
+RVSN=v3.10.0
 RUNTPL=runtemplate-$RVSN
 if [[ -n $1 ]]; then RUNTPL=$1; fi
 
@@ -22,7 +22,7 @@ function getVersionedTool
 getVersionedTool github.com/rickb777/runtemplate/v3 runtemplate $RVSN
 
 core="Stringer:true Comparable:true GobEncode:true"
-int="Ordered:true Numeric:true"
+int="Ordered:true Integer:true"
 enc=""
 
 function generateGroup

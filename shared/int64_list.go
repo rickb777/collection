@@ -2,10 +2,11 @@
 // Thread-safe.
 //
 // Generated from threadsafe/list.tpl with Type=int64
-// options: Comparable:true Numeric:true Ordered:true StringLike:<no value> Stringer:true
+// options: Comparable:true Numeric:<no value> Integer:true Ordered:true
+//          StringLike:<no value> StringParser:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
 
@@ -16,6 +17,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -50,10 +52,23 @@ func NewInt64List(values ...int64) *Int64List {
 // ConvertInt64List constructs a new list containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
 // The returned list will contain all the values that were correctly converted.
+// Conversions are provided from all built-in numeric types.
 func ConvertInt64List(values ...interface{}) (*Int64List, bool) {
 	list := MakeInt64List(0, len(values))
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := int64(j)

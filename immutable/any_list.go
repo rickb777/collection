@@ -3,9 +3,10 @@
 //
 //
 // Generated from immutable/list.tpl with Type=interface{}
-// options: Comparable:true Numeric:<no value> Ordered:<no value> Stringer:true GobEncode:true Mutable:disabled
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Comparable:true Numeric:<no value> Integer:<no value> Ordered:<no value>
+//          StringLike:<no value> StringParser:<no value> Stringer:true
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
 

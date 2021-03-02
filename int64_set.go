@@ -3,9 +3,9 @@
 // Not thread-safe.
 //
 // Generated from simple/set.tpl with Type=int64
-// options: Numeric:true Stringer:true Mutable:always
-// by runtemplate v3.7.1
-// See https://github.com/rickb777/runtemplate/blob/master/v3/BUILTIN.md
+// options: Numeric:<no value> Integer:true Stringer:true Mutable:always
+// by runtemplate v3.10.0
+// See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package collection
 
@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -30,10 +31,23 @@ func NewInt64Set(values ...int64) Int64Set {
 
 // ConvertInt64Set constructs a new set containing the supplied values, if any.
 // The returned boolean will be false if any of the values could not be converted correctly.
+// The returned set will contain all the values that were correctly converted.
 func ConvertInt64Set(values ...interface{}) (Int64Set, bool) {
 	set := make(Int64Set)
 
 	for _, i := range values {
+		switch s := i.(type) {
+		case string:
+			k, e := strconv.ParseInt(s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		case *string:
+			k, e := strconv.ParseInt(*s, 10, 64)
+			if e == nil {
+				i = k
+			}
+		}
 		switch j := i.(type) {
 		case int:
 			k := int64(j)
@@ -113,8 +127,8 @@ func ConvertInt64Set(values ...interface{}) (Int64Set, bool) {
 	return set, len(set) == len(values)
 }
 
-// BuildInt64SetFromChan constructs a new Int64Set from a channel that supplies a sequence
-// of values until it is closed. The function doesn't return until then.
+// BuildInt64SetFromChan constructs a new Int64Set from a channel that supplies
+// a sequence of values until it is closed. The function doesn't return until then.
 func BuildInt64SetFromChan(source <-chan int64) Int64Set {
 	set := make(Int64Set)
 	for v := range source {
