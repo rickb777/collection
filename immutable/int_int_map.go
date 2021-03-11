@@ -4,7 +4,7 @@
 //
 // Generated from immutable/map.tpl with Key=int Type=int
 // options: Comparable:true Stringer:true KeyList:collection.IntList ValueList:collection.IntList Mutable:disabled
-// by runtemplate v3.10.0
+// by runtemplate v3.10.1
 // See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable

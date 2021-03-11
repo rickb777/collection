@@ -11,7 +11,7 @@
 // Generated from threadsafe/queue.tpl with Type=int
 // options: Comparable:true Numeric:<no value> Ordered:true Sorted:<no value> Stringer:true
 // ToList:true ToSet:true
-// by runtemplate v3.10.0
+// by runtemplate v3.10.1
 // See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
