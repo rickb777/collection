@@ -5,7 +5,7 @@
 // options: Comparable:true Numeric:<no value> Integer:true Ordered:true
 //          StringLike:<no value> StringParser:<no value> Stringer:true
 // GobEncode:true Mutable:always ToList:always ToSet:true MapTo:string
-// by runtemplate v3.10.0
+// by runtemplate v3.10.1
 // See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package shared
@@ -542,7 +542,9 @@ func (list *IntList) Clear() {
 	if list != nil {
 		list.s.Lock()
 		defer list.s.Unlock()
-		list.m = list.m[:]
+		// could use list.m[:0] here but it may not free the dropped elements
+		// until their array elements are overwritten
+		list.m = make([]int, 0, cap(list.m))
 	}
 }
 

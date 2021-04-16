@@ -5,7 +5,7 @@
 // Generated from immutable/list.tpl with Type=string
 // options: Comparable:true Numeric:<no value> Integer:<no value> Ordered:<no value>
 //          StringLike:<no value> StringParser:<no value> Stringer:true
-// by runtemplate v3.10.0
+// by runtemplate v3.10.1
 // See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable

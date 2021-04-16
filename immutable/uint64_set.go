@@ -4,7 +4,7 @@
 //
 // Generated from immutable/set.tpl with Type=uint64
 // options: Comparable:always Numeric:<no value> Integer:true Ordered:true Stringer:true Mutable:disabled
-// by runtemplate v3.10.0
+// by runtemplate v3.10.1
 // See https://github.com/rickb777/runtemplate/blob/master/BUILTIN.md
 
 package immutable
